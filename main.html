@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+  <script src="https://cdn.babylonjs.com/babylon.js"></script>
+  <script src="https://cdn.babylonjs.com/loaders/babylonjs.loaders.min.js"></script>
+  <script src="https://code.jquery.com/pep/0.4.3/pep.js"></script>
+
+
+
+  <link rel="stylesheet" type="text/css" href="gos_main.css">
+
+  <title>Babylon Template</title>
+
+  <style>
+
+
+  </style>
+
+
+</head>
+
+<body>
+
+<canvas id="renderCanvas" touch-action="none"></canvas>
+
+<div class="modal">
+  <div class="modal-content">
+    <span class="close-button">×</span>
+
+
+
+    <div id="modal-iframe">This is extremely nice BOX! <br> <p style="color:green">No problems with CSS styling.</p></div>
+  </div>
+</div>
+
+<!--
+<div id="progressBarWrapper">
+  <div id="progressBar"></div>
+</div>
+-->
+
+
+<!-- touch-action="none" for best results from PEP -->
+
+<script>
+  var modal = document.querySelector(".modal");
+//  var trigger = document.querySelector(".trigger");
+  var closeButton = document.querySelector(".close-button");
+
+  function toggleModal() {
+    modal.classList.toggle("show-modal");
+
+  }
+
+  function windowOnClick(event) {
+    if (event.target === modal) {
+      toggleModal();
+    }
+  }
+
+ // trigger.addEventListener("click", toggleModal);
+  closeButton.addEventListener("click", toggleModal);
+  window.addEventListener("click", windowOnClick);
+
+
+</script>
+
+
+<script>
+
+
+
+</script>
+
+<script>
+
+  /**
+   *This map saves references to the individual elements which are saved as separate html elements that refer to elements of the map.
+   */
+
+  var meshContent = {
+    ship1: 'locations/ship1.html',
+    ship2: 'locations/ship2.html',
+    sphere: 'This SPHERE is really wonderful! <br/><h3>HTML tags allowed :)</h3>'
+  }
+
+  const canvas = document.getElementById("renderCanvas"); // Get the canvas element
+  var engine = new BABYLON.Engine(canvas, true, {
+    preserveDrawingBuffer: true,
+    stencil: true,
+    disableWebGL2Support: false
+  });
+
+  /*
+
+  var scene = null;
+  var sceneToRender = null;
+  var createDefaultEngine = function() {
+    return new BABYLON.Engine(canvas, true, {
+      preserveDrawingBuffer: true,
+      stencil: true,
+      disableWebGL2Support: false
+    });
+  };
+   */
+
+
+  function createCamera(scene, canvas) {
+    //let initialCameraPosition = new BABYLON.Vector3(0,300,0);
+    let initialCameraPosition = BABYLON.Vector3.Zero();
+    let camera = new BABYLON.ArcRotateCamera("Camera", -Math.PI / 2, Math.PI / 2.5, 2, initialCameraPosition, scene);
+    let light = new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(1, 1, 0), scene);
+    light.intensity = 1.2; // Increase intensity (default is 1)
+
+    camera.attachControl(canvas, true);
+    // Add a lights to the scene
+   //
+
+    // Add a lights to the scene
+    // let light = new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(1, 1, 0), scene);
+   // camera.attachControl(canvas, true);
+    return camera;
+  }
+
+  function createSkyBox(scene, assetsManager) {
+
+    var cubeTextureTask = assetsManager.addCubeTextureTask("skyboxTask", "http://localhost:8080/skybox/space2bg", [
+      "_px.jpg",
+      "_nx.jpg",
+      "_py.jpg",
+      "_ny.jpg",
+      "_pz.jpg",
+      "_nz.jpg"
+    ]);
+
+    // Create a skybox with the JPG image
+    cubeTextureTask.onSuccess = function (task) {
+
+      let skybox = BABYLON.Mesh.CreateBox("skyBox", 1000.0, scene);
+      let skyboxMaterial = new BABYLON.StandardMaterial("skyBox", scene);
+      skyboxMaterial.backFaceCulling = false;
+      skyboxMaterial.reflectionTexture = cubeTextureTask.texture;
+      skyboxMaterial.reflectionTexture.coordinatesMode = BABYLON.Texture.SKYBOX_MODE;
+      skyboxMaterial.disableLighting = true;
+      skybox.material = skyboxMaterial;
+
+// Set the JPG image as the environment texture
+      scene.environmentTexture = skyboxMaterial.reflectionTexture;
+    }
+
+  }
+
+  //Zoom in on mesh upon click
+  function applyZoom(mesh,camera) {
+    if (!mesh.actionManager) {
+      mesh.actionManager = new BABYLON.ActionManager(mesh.getScene());
+    }
+
+    mesh.actionManager.registerAction(
+            new BABYLON.ExecuteCodeAction(
+                    BABYLON.ActionManager.OnPickTrigger,
+                    function (event) {
+                      var pickedMesh = event.meshUnderPointer;
+                      if (pickedMesh === mesh) {
+                        var angle =  Math.PI / 4; // 225 degrees
+                        var distance = 20; // distance from the mesh
+
+                        // Calculate the new camera position
+                        var camX = mesh.getAbsolutePosition().x - distance * Math.cos(angle);
+                        var camY = mesh.getAbsolutePosition().y + distance * Math.sin(angle);
+                        var camZ = mesh.getAbsolutePosition().z - distance * Math.sin(angle);
+
+                        var camEndPos = new BABYLON.Vector3(camX, camY, camZ);
+
+                        // Calculate the new target position
+                        /*
+                        var targetX = mesh.getAbsolutePosition().x;
+                        var targetY = mesh.getAbsolutePosition().y;
+                        var targetZ = mesh.getAbsolutePosition().z;
+
+                        var targetEndPos = new BABYLON.Vector3(targetX, targetY, targetZ);
+                         */
+
+                        var targetEndPos = mesh.getAbsolutePosition();
+
+
+                        var speed = 45;
+                        var ease = new BABYLON.CubicEase();
+
+                        ease.setEasingMode(BABYLON.EasingFunction.EASINGMODE_EASEINOUT);
+
+                        BABYLON.Animation.CreateAndStartAnimation(
+                                'at4',
+                                camera,
+                                'position',
+                                speed,
+                                120,
+                                camera.position,
+                                camEndPos,
+                                0,
+                                ease
+                        );
+
+                        BABYLON.Animation.CreateAndStartAnimation(
+                                'at5',
+                                camera,
+                                'target',
+                                speed,
+                                120,
+                                camera.target,
+                                targetEndPos,
+                                0,
+                                ease
+                        );
+                      }
+                    }
+            )
+    );
+
+    console.log("Applied Zoom to mesh: " + mesh.name);
+  }
+
+  // write a function that adds functionality to each mesh in a list
+  function setupMeshFunctionality(meshList, camera) {
+    meshList.forEach(function (mesh) {
+
+      if (mesh.getChildMeshes().length > 0) {
+        const childMesh = mesh.getChildMeshes()[0];
+        console.log(childMesh.name);
+        applyZoom(childMesh,camera);
+      } else {
+        console.log(mesh.name);
+        applyZoom(mesh,camera);
+      }
+    });
+  }
+
+  //Open modal frame with location information
+  // Checking onPointerDown event, see console
+
+  function addInfoTolocations(scene) {
+    scene.onPointerDown = function (evt, pickResult) {
+      setTimeout(function () {
+        if (pickResult.hit) {
+          console.log("pickResult.hit: " + pickResult.pickedMesh.name);
+          if (meshContent[pickResult.pickedMesh.name]) {
+            console.log("In the list");
+            toggleModal();
+            console.log(meshContent.hasOwnProperty(pickResult.pickedMesh.name)); // false if not in our object
+            console.log(pickResult.pickedMesh.name);
+            console.log("Mesh: " + pickResult.pickedMesh.name + "; ID: " + meshContent[pickResult.pickedMesh.name]);
+            document.getElementById("modal-iframe").innerHTML = "<iframe src=\"http://localhost:63342/graveyard_of_ships/" + meshContent[pickResult.pickedMesh.name] + "\" title=\"Modal\"frameborder=\"0\" style=\"overflow:hidden;overflow-x:hidden;overflow-y:hidden;height:100%;width:100%;position:absolute;top:40px;left:0px;right:0px;bottom:0px\" height=\"100%\" width=\"100%\"></iframe>"
+          }
+        }
+      }, 1000);
+    }
+  }
+
+
+  function createDashedlines(edgeList, scene) {
+    edgeList.forEach(function (edge) {
+      let dashedLines = BABYLON.MeshBuilder.CreateDashedLines("dashedLines", { points: edge, updatable: true }, scene);
+      dashedLines.color = new BABYLON.Color3(1, 1, 1); // Set color to white (R:1, G:1, B:1)
+      dashedLines.dashSize = 6; // Increase the dash size to make the lines larger
+      dashedLines.gapSize = 6; // Increase the gap size for larger gaps between dashes
+      dashedLines.alpha = 0.5;
+    });
+  }
+
+  function createDashedCylinderLines(edgeList, scene, thickness, dashSize, gapSize, bufferDistance) {
+    edgeList.forEach(function (edge) {
+      let startPoint = edge[0];
+      let endPoint = edge[1];
+
+      let direction = endPoint.subtract(startPoint).normalize();
+      let fullLength = endPoint.subtract(startPoint).length();
+
+      // Adjust the start and end points by the buffer distance
+      startPoint = startPoint.add(direction.scale(bufferDistance));
+      endPoint = endPoint.subtract(direction.scale(bufferDistance));
+
+      let adjustedLength = endPoint.subtract(startPoint).length();
+      let normalizedDirection = endPoint.subtract(startPoint).normalize();
+
+      let numDashes = Math.floor(adjustedLength / (dashSize + gapSize));
+
+      let dashedLine = new BABYLON.Mesh("dashedLine", scene);
+
+      for (let i = 0; i < numDashes; i++) {
+        let dashPosition = startPoint.add(normalizedDirection.scale(i * (dashSize + gapSize) + dashSize / 2));
+
+
+        /*
+        let dashCylinder = BABYLON.MeshBuilder.CreateCylinder("dashCylinder", {
+          height: dashSize,
+          diameter: thickness
+        }, scene);
+
+         */
+
+        let dashCylinder = createCapsule(scene, dashSize, thickness);
+
+        dashCylinder.position = dashPosition;
+
+        // Calculate the rotation axis and angle
+        let up = new BABYLON.Vector3(0, 1, 0); // Cylinder's default up direction
+        let axis = BABYLON.Vector3.Cross(up, normalizedDirection).normalize();
+        let angle = Math.acos(BABYLON.Vector3.Dot(up, normalizedDirection));
+
+        // Apply the rotation
+        dashCylinder.rotationQuaternion = BABYLON.Quaternion.RotationAxis(axis, angle);
+
+        // Parent the dash cylinder to the dashed line
+        dashCylinder.parent = dashedLine;
+      }
+
+      /*
+      let material = new BABYLON.UnlitMaterial("dashedLineMaterial", scene);
+      material.diffuseColor = new BABYLON.Color3(1, 0.9, 0.8); // Set color to white
+      dashedLine.material = material;
+
+       */
+    });
+  }
+
+  function createCapsule(scene, height, diameter) {
+    var radius = diameter / 2;
+    var cylinderHeight = height - diameter; // subtract the spherical caps from the cylinder height
+
+    // Create cylinder
+    var cylinder = BABYLON.MeshBuilder.CreateCylinder("cylinder", {height: cylinderHeight, diameter: diameter}, scene);
+
+    // Create top and bottom spheres
+    var topSphere = BABYLON.MeshBuilder.CreateSphere("topSphere", {diameter: diameter}, scene);
+    topSphere.position.y = cylinderHeight / 2;
+
+    var bottomSphere = BABYLON.MeshBuilder.CreateSphere("bottomSphere", {diameter: diameter}, scene);
+    bottomSphere.position.y = -cylinderHeight / 2;
+
+    // Merge all parts into one mesh
+    var capsule = BABYLON.Mesh.MergeMeshes([cylinder, topSphere, bottomSphere], true, true, undefined, false, false);
+
+    let material = new BABYLON.StandardMaterial("dashedLineMaterial", scene);
+    material.diffuseColor = new BABYLON.Color3(1, 0.9, 0.8); // Set color to white
+    capsule.material = material;
+
+    return capsule;
+  }
+
+  function createScene(onAssetsLoaded) {
+    let scene = new BABYLON.Scene(engine);
+    let assetsManager = new BABYLON.AssetsManager(scene);
+
+    const camera = createCamera(scene, canvas);
+
+    createSkyBox(scene, assetsManager);
+
+    // Load the assets
+    //Create empty list of meshes
+    const meshList = [];
+    const edgeList = [];
+
+    /*
+    const cargoMesh = assetsManager.addMeshTask("cargo task", "", "http://localhost:8080/models/","cargo.glb");
+
+    cargoMesh.onSuccess = function (task) {
+
+      let mesh = task.loadedMeshes[0];
+      console.log("Applying zoom to: ");
+      scene.addMesh(mesh);
+      mesh.position = new BABYLON.Vector3(0, 0, 20);
+      console.log("Set position");
+ //    mesh.freezeWorldMatrix();
+    }
+
+    cargoMesh.onError = function (task, message, exception) {
+      console.log(message, exception);
+    };
+
+     */
+
+    const practiceMesh = assetsManager.addMeshTask("practice task", "", "http://localhost:8080/models/","practice_cube.glb");
+
+    practiceMesh.onSuccess = function (task) {
+
+      let mesh = task.loadedMeshes[0];
+      scene.addMesh(mesh);
+      mesh.position = new BABYLON.Vector3(0, 30, 30);
+      console.log("Set position");
+      //    mesh.freezeWorldMatrix();
+    }
+
+    practiceMesh.onError = function (task, message, exception) {
+      console.log(message, exception);
+    };
+
+
+     const box = BABYLON.MeshBuilder.CreateSphere("ship1", {size: 2}, scene);
+
+      // Create a new material with a red diffuse color
+      var material = new BABYLON.StandardMaterial("redMaterial", scene);
+      material.diffuseColor = new BABYLON.Color3(1, 0, 0); // set to red
+
+// Assume that "mesh" is the mesh object that you want to color
+      box.material = material;
+
+      box.position = new BABYLON.Vector3(0, 0, 0);
+      scene.addMesh(box);
+      meshList.push(box);
+
+
+
+
+      const box2 = BABYLON.MeshBuilder.CreateBox("ship2", {size: 1}, scene);
+      box2.position = new BABYLON.Vector3(0, 0, 5);
+      scene.addMesh(box2);
+      meshList.push(box2);
+
+      edgeList.push([box.position, box2.position]);
+
+      //Functions
+
+    assetsManager.onFinish = function (tasks) {
+      tasks.forEach(function (task) {
+        // Assuming these are mesh tasks, add them to the meshList
+        // Adjust this logic based on the type of tasks and your requirements
+        if (task.loadedMeshes) {
+            meshList.push(task.loadedMeshes[0]);
+        }
+      });
+
+      // Call the callback function with the scene and the loaded meshList
+      onAssetsLoaded(scene, meshList, edgeList);
+    };
+
+    assetsManager.load();
+
+
+
+   // scene.debugLayer.show();
+    //return scene and meshList
+    return scene;
+  };
+
+  let scene = createScene(function (loadedScene, loadedMeshList, loadedEdgeList) {
+    var camera = loadedScene.activeCamera;
+
+    console.log("Scene meshes:", loadedMeshList);
+
+    setupMeshFunctionality(loadedMeshList, camera);
+    addInfoTolocations(loadedScene);
+
+    console.log("edge list: ", loadedEdgeList);
+
+  //  createDashedlines(loadedEdgeList, loadedScene);
+    createDashedCylinderLines(loadedEdgeList, loadedScene,0.05,0.175, 0.1,0.75);
+  })
+
+
+
+
+
+  engine.runRenderLoop(function () {
+    scene.render();
+  });
+
+
+  // The engine part, don't touch if you don't know what to do :)
+/*
+  window.initFunction = async function() {
+
+    var asyncEngineCreation = async function() {
+      try {
+        return createDefaultEngine();
+      } catch (e) {
+        console.log("the available createEngine function failed. Creating the default engine instead");
+        return createDefaultEngine();
+      }
+    }
+
+    window.engine = await asyncEngineCreation();
+    if (!engine) throw 'engine should not be null.';
+    window.scene = createScene();
+  };
+  initFunction().then(() => {
+    sceneToRender = scene
+    engine.runRenderLoop(function() {
+      if (sceneToRender && sceneToRender.activeCamera) {
+        sceneToRender.render();
+      }
+    });
+  });
+
+
+ */
+  // Resize
+  window.addEventListener("resize", function() {
+    engine.resize();
+  });
+</script>
+</body>
+</html>

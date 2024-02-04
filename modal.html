@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Tabbed Content</title>
+  <style>
+    .tabs {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      background-color: #ddd;
+      padding: 5px;
+    }
+
+    .tab {
+      padding: 5px;
+      border: 1px solid #aaa;
+      border-radius: 5px 5px 0 0;
+      background-color: #fff;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .tab.active {
+      background-color: #ddd;
+      border-bottom: none;
+      cursor: default;
+    }
+
+    .tab-content {
+      padding: 10px;
+      border: 1px solid #aaa;
+      border-radius: 0 0 5px 5px;
+      background-color: #fff;
+    }
+  </style>
+</head>
+<body>
+<div class="tabs">
+  <div class="tab active" data-tab="tab1">Tab 1</div>
+  <div class="tab" data-tab="tab2">Tab 2</div>
+  <div class="tab" data-tab="tab3">Tab 3</div>
+</div>
+<div class="tab-content" data-tab="tab1">
+  <p>Content for tab 1 goes here.</p>
+</div>
+<div class="tab-content" data-tab="tab2">
+  <p>Content for tab 2 goes here.</p>
+</div>
+<div class="tab-content" data-tab="tab3">
+  <p>Content for tab 3 goes here.</p>
+</div>
+<script>
+  // Get all the tabs and tab content elements
+  const tabs = document.querySelectorAll('.tab');
+  const tabContents = document.querySelectorAll('.tab-content');
+
+  // Set up the click event listener for each tab
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      // Deactivate all tabs and tab contents
+      tabs.forEach(tab => tab.classList.remove('active'));
+      tabContents.forEach(content => content.style.display = 'none');
+
+      // Activate the clicked tab and its corresponding content
+      tab.classList.add('active');
+      const selectedTab = tab.dataset.tab;
+      document.querySelector(`.tab-content[data-tab="${selectedTab}"]`).style.display = 'block';
+    });
+  });
+
+  // Activate the first tab by default
+  tabs[0].click();
+</script>
+</body>
+</html>
