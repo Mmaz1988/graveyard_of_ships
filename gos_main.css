@@ -25,6 +25,8 @@ body {
     transform: scaleX(1.1) scaleY(1.1);
     transition: visibility 0s linear 0.25s, opacity 0.25s 0s, transform 0.25s;
     font-family: sans-serif;
+    display: flex; /* Use flexbox to arrange children */
+    flex-direction: column; /* Stack children vertically */
 }
 
 .modal-content {
@@ -38,6 +40,24 @@ body {
     height: 80%;
     border-radius: 0.5rem;
     z-index: 99000 !important;
+    display: flex; /* Use flexbox to arrange children */
+    flex-direction: column; /* Stack children vertically */
+}
+
+.close-button {
+    /* Assuming you want the close button to sit at the top-right of the modal */
+    align-self: flex-end; /* Align to the right */
+    cursor: pointer;
+    z-index: 2; /* Ensure it's above the iframe */
+}
+
+#modal-iframe {
+    position: relative; /* No longer need absolute positioning */
+    overflow: auto; /* Allow scrolling within the iframe */
+    flex-grow: 1; /* Take up remaining space */
+    top: 0; /* Reset top positioning */
+    width: calc(100% - 3rem); /* Adjust based on padding of modal-content */
+    height: 100%; /* Full height */
 }
 
 .close-button {

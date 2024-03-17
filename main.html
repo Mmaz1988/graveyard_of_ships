@@ -53,10 +53,17 @@
   //This is a list of all meshes used in the map
   //Each mesh is linked to an html page describing it
   var meshContent = {
+    varutha_ship_primitive0: 'locations/varutha_ship.html',
     ship1: 'locations/ship1.html',
     ship2: 'locations/ship2.html',
     sphere: 'This SPHERE is really wonderful! <br/><h3>HTML tags allowed :)</h3>'
   }
+
+  // Global variables for cameras
+  let universalCamera;
+  let arcRotateCamera;
+  let lastSelectedMesh;
+
 
   //The top level object for using Babylon used to display the map (i.e., the scene)
   const canvas = document.getElementById("renderCanvas"); // Get the canvas element
@@ -66,11 +73,24 @@
     disableWebGL2Support: false
   });
 
+  document.addEventListener('keydown', function(event) {
+    if (event.key === 'c' || event.key === 'C') {
+      switchCamera(scene, universalCamera, arcRotateCamera);
+    }
+  });
+
   function createScene(onAssetsLoaded) {
     let scene = new BABYLON.Scene(engine);
     let assetsManager = new BABYLON.AssetsManager(scene);
 
-    scene.activeCamera = createCamera(scene, canvas);
+    createUniversalCamera(scene, canvas);
+    createArcRotateCamera(scene, canvas);
+    scene.activeCamera = universalCamera;
+
+    let light = new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(1, 1, 0), scene);
+    light.intensity = 1; // Increase intensity (default is 1)
+
+
     createSkyBox(scene, assetsManager);
 
     // Load the assets
@@ -79,73 +99,145 @@
     const edgeList = [];
 
 
- //    const cargoMesh = assetsManager.addMeshTask("cargo task", "", "http://localhost:8080/models/","cargo.glb");
- //
- //    cargoMesh.onSuccess = function (task) {
- //
- //      let mesh = task.loadedMeshes[0];
- //      console.log("Applying zoom to: ");
- //      scene.addMesh(mesh);
- //      mesh.position = new BABYLON.Vector3(0, 0, 20);
- //      console.log("Set position");
- // //    mesh.freezeWorldMatrix();
- //    }
- //
- //    cargoMesh.onError = function (task, message, exception) {
- //      console.log(message, exception);
- //    };
+    const cargoMesh = assetsManager.addMeshTask("cargo task", "", "http://localhost:8080/models/","cargo.glb");
 
-
-
-  /*  const practiceMesh = assetsManager.addMeshTask("practice task", "", "http://localhost:8080/models/","practice_cube2.glb");
-
-    practiceMesh.onSuccess = function (task) {
-
+    cargoMesh.onSuccess = function (task) {
       let mesh = task.loadedMeshes[0];
+      mesh.setParent(null);
+      console.log("Applying zoom to: ");
       scene.addMesh(mesh);
-      mesh.position = new BABYLON.Vector3(0, 30, 30);
+      mesh.position = new BABYLON.Vector3(20, -50, -350);
       console.log("Set position");
-      //    mesh.freezeWorldMatrix();
-    }
 
-    practiceMesh.onError = function (task, message, exception) {
+      // Apply scale
+      mesh.scaling = new BABYLON.Vector3(2, 2, 2);
+
+      // Apply rotation
+      mesh.rotation.y = -45 * (Math.PI / 180);
+      mesh.rotation.x = 100 * (Math.PI / 180);
+      mesh.rotation.z = 30 * (Math.PI / 180);
+
+      // Optionally freeze the world matrix after all transformations are applied
+  //    mesh.freezeWorldMatrix();
+    };
+
+    cargoMesh.onError = function (task, message, exception) {
       console.log(message, exception);
     };
-*/
+
+
+    const varutha_ship_task = assetsManager.addMeshTask("practice task", "", "http://localhost:8080/models/","varutha_cone_ship_join.glb");
+
+    varutha_ship_task.onSuccess = function (task) {
+
+      let varutha_ship = task.loadedMeshes[0];
+      varutha_ship.computeWorldMatrix(true);
+
+      varutha_ship.name = "varutha_ship";
+      console.log("varutha_ship:", varutha_ship)
+      // var boundingInfo = mesh.getBoundingInfo();
+      // var height = boundingInfo.maximum.y - boundingInfo.minimum.y;
+      //
+      // var desiredHeight = 170;// Height from Step 3
+      // var scaleFactor = desiredHeight / height;
+      //
+      // console.log("scale factor:", scaleFactor)
+      //
+      // mesh.scaling = new BABYLON.Vector3(scaleFactor, scaleFactor, scaleFactor);
+
+      varutha_ship.position = new BABYLON.Vector3(0, -50, 0);
+
+      // Apply rotation
+      varutha_ship.rotation.y = 30 * (Math.PI / 180);
+      varutha_ship.rotation.x = 30 * (Math.PI / 180);
+      varutha_ship.rotation.z = 30 * (Math.PI / 180);
+
+
+      scene.addMesh(varutha_ship);
+      meshList.push(varutha_ship);
+
+      console.log("Set position");
+   //   varutha_ship.freezeWorldMatrix();
+    }
+
+    varutha_ship_task.onError = function (task, message, exception) {
+      console.log(message, exception);
+    };
+
 
     //Starting point
      const box = BABYLON.MeshBuilder.CreateSphere("bumblebee", {diameter: 5}, scene);
       // Create a new material with a red diffuse color
       var red_material = new BABYLON.StandardMaterial("redMaterial", scene);
       red_material.diffuseColor = new BABYLON.Color3(1, 0, 0); // set to red
+      red_material.specularColor = new BABYLON.Color3(0, 0, 0);
       // Assume that "mesh" is the mesh object that you want to color
       box.material = red_material;
-      box.position = new BABYLON.Vector3(0, 0, -400);
+      box.position = new BABYLON.Vector3(40, 0, -400);
       scene.addMesh(box);
       meshList.push(box);
 
     //Pirate outpost
-    const box1 = BABYLON.MeshBuilder.CreateSphere("pirate_outpost", {diameter: 10}, scene);
-    // Create a new material with a red diffuse color
-    var grey_material = new BABYLON.StandardMaterial("redMaterial", scene);
-    grey_material.diffuseColor = new BABYLON.Color3(0.2, 0.2, 0.2); // set to red
-    // Assume that "mesh" is the mesh object that you want to color
-    box1.material = grey_material;
-    box1.position = new BABYLON.Vector3(0, -50, -350);
-    scene.addMesh(box1);
-    meshList.push(box1);
-    edgeList.push([box.position, box1.position]);
+    // const box1 = BABYLON.MeshBuilder.CreateSphere("pirate_outpost", {diameter: 10}, scene);
+    // // Create a new material with a red diffuse color
+    // var grey_material = new BABYLON.StandardMaterial("redMaterial", scene);
+    // grey_material.diffuseColor = new BABYLON.Color3(0.2, 0.2, 0.2); // set to red
+    // grey_material.specularColor = new BABYLON.Color3(0, 0, 0);
+    // // Assume that "mesh" is the mesh object that you want to color
+    // box1.material = grey_material;
+    // box1.position = new BABYLON.Vector3(20, -50, -350);
+    // scene.addMesh(box1);
+    // meshList.push(box1);
+    // edgeList.push([box.position, box1.position]);
 
-    //Pirate outpost
-    const box2 = BABYLON.MeshBuilder.CreateSphere("pirate_outpost", {diameter: 150}, scene);
+    //metal crusher nest
+    const box2 = BABYLON.MeshBuilder.CreateSphere("metal_crusher_nest", {diameter: 150}, scene);
     // Create a new material with a red diffuse color
     var dark_material = new BABYLON.StandardMaterial("redMaterial", scene);
     dark_material.diffuseColor = new BABYLON.Color3(0.1, 0.1, 0.1); // set to red
+    dark_material.specularColor = new BABYLON.Color3(0, 0, 0);
+    dark_material.alpha = 1;
+    dark_material.depth_write = true;
     // Assume that "mesh" is the mesh object that you want to color
     box2.material = dark_material;
     box2.position = new BABYLON.Vector3(-350, -150, 20);
     scene.addMesh(box2);
     meshList.push(box2);
+
+    //Pirate hideout
+    const box3 = BABYLON.MeshBuilder.CreateSphere("pirate_hideout", {diameter: 100}, scene);
+    // Create a new material with a red diffuse color
+    // Assume that "mesh" is the mesh object that you want to color
+    box3.material = dark_material;
+    box3.position = new BABYLON.Vector3(200, 100, -170);
+    scene.addMesh(box3);
+    meshList.push(box3);
+
+    var box4 = BABYLON.MeshBuilder.CreateBox("sleeping_beauty", {
+      width: 25,  // Set the width of the box
+      height: 40, // Set the height of the box
+      depth: 120  // Set the depth (length) of the box
+    }, scene);
+// Create a new standard material
+    var sleep_beaut_material = new BABYLON.StandardMaterial("myMaterial", scene);
+
+// Set the diffuse color to a light grey with a tint of red
+// Note: BABYLON.Color3 takes RGB values between 0 and 1
+    var redTint = 0.8; // Adjust for more or less red
+    var greyBase = 0.8; // Light grey base
+    sleep_beaut_material.diffuseColor = new BABYLON.Color3(redTint, greyBase * 0.9, greyBase * 0.9); // Slightly red tinted light grey
+    box4.material = sleep_beaut_material
+    box4.specularColor = new BABYLON.Color3(0, 0, 0);
+    box4.position = new BABYLON.Vector3(200, 100, 150);
+    box4.rotation.y = -45 * (Math.PI / 180); // Rotates the box 45 degrees around the Y axis
+
+// If you want to rotate around other axes, you can similarly adjust rotation.x or rotation.z
+    box4.rotation.x = 10 * (Math.PI / 180); // Rotates the box 30 degrees around the X axis
+    //box4.rotation.z = 60 * (Math.PI / 180); // Rotates the box 60 degrees around the Z axis
+    scene.addMesh(box4)
+    meshList.push(box4)
+
+
 
 
     var ufoDome = BABYLON.MeshBuilder.CreateSphere("ufo", {diameter: 100}, scene); // This creates an ellipsoid
@@ -155,7 +247,9 @@
     var light_material = new BABYLON.StandardMaterial("lightMaterial",scene);
     var green_material = new BABYLON.StandardMaterial("lgreenMaterial",scene);
     light_material.diffuseColor = new BABYLON.Color3(0.8,0.8,0.8)
+    light_material.specularColor = new BABYLON.Color3(0, 0, 0);
     green_material.diffuseColor = new BABYLON.Color3(0.0,0.8,0.2)
+    green_material.specularColor = new BABYLON.Color3(0, 0, 0);
     ufo.material = light_material;
     ufoDome.material = green_material;
     ufo.position = new BABYLON.Vector3(-300,100,350);
@@ -171,20 +265,178 @@
       // meshList.push(box2);
       // edgeList.push([box.position, box2.position]);
 
-      const centralShip = BABYLON.MeshBuilder.CreateCylinder("cone", {
-        height: 170,
-        diameterTop: 0,
-        diameterBottom: 42,
-        tessellation: 64 // Defines the number of sides. Increase for a smoother surface.
-      }, scene);
-      centralShip.position = new BABYLON.Vector3(0, -50, 0);
-    var coneMaterial = new BABYLON.StandardMaterial("coneMaterial", scene);
-    coneMaterial.diffuseColor = new BABYLON.Color3(0.7, 0.7, 0.7); // Light grey as the base color
-    coneMaterial.specularColor = new BABYLON.Color3(0.8, 0.8, 0.8); // Bright white for specular highlights
-    coneMaterial.specularPower = 50; // Adjust for shininess - lower value makes it more "shiny"
-    coneMaterial.emissiveColor = new BABYLON.Color3(0.1, 0.1, 0.1); // Slightly emissive to simulate metallic sheen
+    //   const centralShip = BABYLON.MeshBuilder.CreateCylinder("cone", {
+    //     height: 170,
+    //     diameterTop: 0,
+    //     diameterBottom: 140,
+    //     tessellation: 64 // Defines the number of sides. Increase for a smoother surface.
+    //   }, scene);
+    //   centralShip.position = new BABYLON.Vector3(0, -50, 0);
+    // var coneMaterial = new BABYLON.StandardMaterial("coneMaterial", scene);
+    // coneMaterial.diffuseColor = new BABYLON.Color3(0.7, 0.7, 0.7); // Light grey as the base color
+    // coneMaterial.specularColor = new BABYLON.Color3(0.8, 0.8, 0.8); // Bright white for specular highlights
+    // coneMaterial.specularPower = 50; // Adjust for shininess - lower value makes it more "shiny"
+    // coneMaterial.emissiveColor = new BABYLON.Color3(0.1, 0.1, 0.1); // Slightly emissive to simulate metallic sheen
+    //
+    // centralShip.material = coneMaterial;
+    // scene.addMesh(centralShip)
+    // meshList.push(centralShip)
 
-    centralShip.material = coneMaterial;
+    //Iterate through mesh list and assign every mesh renderingGroup 1
+    // for (var i = 0; i < meshList.length; i++) {
+    //   meshList[i].renderingGroupId = 1;
+    // }
+
+  /*Sun, taken from: https://www.babylonjs-playground.com/#YSQLI3#0 (11.03.2024)s
+  */
+
+    // Create a particle system
+    var surfaceParticles = new BABYLON.ParticleSystem("surfaceParticles", 1600, scene);
+    var flareParticles = new BABYLON.ParticleSystem("flareParticles", 20, scene);
+
+    // Texture of each particle
+    surfaceParticles.particleTexture = new BABYLON.Texture("https://raw.githubusercontent.com/PatrickRyanMS/BabylonJStextures/master/ParticleSystems/Sun/T_SunSurface.png", scene);
+    flareParticles.particleTexture = new BABYLON.Texture("https://raw.githubusercontent.com/PatrickRyanMS/BabylonJStextures/master/ParticleSystems/Sun/T_SunFlare.png", scene);
+
+
+
+    var scaleFactor = 500 / 2.01;
+
+    // Create core sphere
+    var coreSphere = BABYLON.MeshBuilder.CreateSphere("coreSphere", {diameter: 500, segments: 64}, scene);
+    coreSphere.position = new BABYLON.Vector3(750, 750,750);
+
+    // Create core material
+    var coreMat = new BABYLON.StandardMaterial("coreMat", scene)
+    coreMat.emissiveColor = new BABYLON.Color3(0.3773, 0.0930, 0.0266);
+
+    // Assign core material to sphere
+    coreSphere.material = coreMat;
+
+    // Pre-warm
+    surfaceParticles.preWarmStepOffset = 10;
+    surfaceParticles.preWarmCycles = 100;
+
+    flareParticles.preWarmStepOffset = 10;
+    flareParticles.preWarmCycles = 100;
+
+    // Initial rotation
+    surfaceParticles.minInitialRotation = -2 * Math.PI;
+    surfaceParticles.maxInitialRotation = 2 * Math.PI;
+
+    flareParticles.minInitialRotation = -2 * Math.PI;
+    flareParticles.maxInitialRotation = 2 * Math.PI;
+
+    // Where the sun particles come from
+    var sunEmitter = new BABYLON.SphereParticleEmitter();
+    sunEmitter.radius = scaleFactor;
+    sunEmitter.radiusRange = 0; // emit only from shape surface
+
+
+    // Assign particles to emitters
+    surfaceParticles.emitter = coreSphere; // the starting object, the emitter
+    surfaceParticles.particleEmitterType = sunEmitter;
+
+    flareParticles.emitter = coreSphere; // the starting object, the emitter
+    flareParticles.particleEmitterType = sunEmitter;
+
+    // Color gradient over time
+    surfaceParticles.addColorGradient(0, new BABYLON.Color4(0.8509, 0.4784, 0.1019, 0.0));
+    surfaceParticles.addColorGradient(0.4, new BABYLON.Color4(0.6259, 0.3056, 0.0619, 0.5));
+    surfaceParticles.addColorGradient(0.5, new BABYLON.Color4(0.6039, 0.2887, 0.0579, 0.5));
+    surfaceParticles.addColorGradient(1.0, new BABYLON.Color4(0.3207, 0.0713, 0.0075, 0.0));
+
+    flareParticles.addColorGradient(0, new BABYLON.Color4(1, 0.9612, 0.5141, 0.0));
+    flareParticles.addColorGradient(0.25, new BABYLON.Color4(0.9058, 0.7152, 0.3825, 1.0));
+    flareParticles.addColorGradient(1.0, new BABYLON.Color4(0.6320, 0.0, 0.0, 0.0));
+
+    // Size of each particle (random between...
+    surfaceParticles.minSize = 0.4 * scaleFactor;
+    surfaceParticles.maxSize = 0.7 * scaleFactor;
+
+    flareParticles.minScaleX = 0.5 * scaleFactor;
+    flareParticles.minScaleY = 0.5 * scaleFactor;
+    flareParticles.maxScaleX= scaleFactor;
+    flareParticles.maxScaleY = scaleFactor;
+
+    // Size over lifetime
+    flareParticles.addSizeGradient(0, 0);
+    flareParticles.addSizeGradient(1, 1);
+
+    // Life time of each particle (random between...
+    surfaceParticles.minLifeTime = 8.0;
+    surfaceParticles.maxLifeTime = 8.0;
+
+    flareParticles.minLifeTime = 10.0;
+    flareParticles.maxLifeTime = 10.0;
+
+    // Emission rate
+    surfaceParticles.emitRate = 200 ;
+    flareParticles.emitRate = 1 ;
+
+    // Blend mode : BLENDMODE_ONEONE, BLENDMODE_STANDARD, or BLENDMODE_ADD
+    surfaceParticles.blendMode = BABYLON.ParticleSystem.BLENDMODE_ADD;
+    flareParticles.blendMode = BABYLON.ParticleSystem.BLENDMODE_ADD;
+
+
+    // Set the gravity of all particles
+    surfaceParticles.gravity = new BABYLON.Vector3(0, 0, 0);
+    flareParticles.gravity = new BABYLON.Vector3(0, 0, 0);
+
+
+    // Angular speed, in radians
+    surfaceParticles.minAngularSpeed = -0.4;
+    surfaceParticles.maxAngularSpeed = 0.4;
+
+    flareParticles.minAngularSpeed = 0.0;
+    flareParticles.maxAngularSpeed = 0.0;
+
+    // Speed
+    surfaceParticles.minEmitPower = 0;
+    surfaceParticles.maxEmitPower = 0;
+    surfaceParticles.updateSpeed = 0.005;
+
+    flareParticles.minEmitPower = 0.001;
+    flareParticles.maxEmitPower = 0.01;
+
+    // coronaParticles.minEmitPower = 0.0;
+    // coronaParticles.maxEmitPower = 0.0;
+
+    // No billboard
+    surfaceParticles.isBillboardBased = false;
+    flareParticles.isBillboardBased = true;
+
+
+    // Render Order
+    flareParticles.renderingGroupId = 2;
+    surfaceParticles.renderingGroupId = 3;
+    coreSphere.renderingGroupId = 3;
+
+    // Ensure depth write is enabled for particles to be occluded by meshes
+    surfaceParticles.disableDepthWrite = false;
+    flareParticles.disableDepthWrite = false;
+
+    // Set transparency using materials for a more natural look
+    var surfaceMaterial = new BABYLON.StandardMaterial("surfaceMaterial", scene);
+    surfaceMaterial.alpha = 0.7; // Adjust opacity as needed
+    surfaceParticles.material = surfaceMaterial;
+
+    var flareMaterial = new BABYLON.StandardMaterial("flareMaterial", scene);
+    flareMaterial.alpha = 1.0; // Adjust opacity as needed
+    flareParticles.material = flareMaterial;
+
+// Optionally, animate the material alpha for a fading effect:
+    scene.registerBeforeRender(function () {
+      surfaceMaterial.alpha -= 0.005; // Adjust fade rate as needed
+      flareMaterial.alpha -= 0.01; // Adjust fade rate as needed
+    });
+
+
+    // Start the particle system
+    surfaceParticles.start();
+    flareParticles.start();
+   // coronaParticles.start();
+  //  starsParticles.start();
 
       //Functions
     assetsManager.onFinish = function (tasks) {
@@ -209,14 +461,28 @@
 
     assetsManager.load();
 
-    // scene.fogEnabled = true;
-    // scene.fogMode = BABYLON.Scene.FOGMODE_LINEAR;
-    // scene.fogStart = 1200.0; // The distance from the camera where fog starts
-    // scene.fogEnd = 1200.0; // The distance from the camera where fog fully obscures objects
-    // scene.fogColor = new BABYLON.Color3(0.1, 0.1, 0.1); // Adjust the color to match the scene's background/skybox
+    // var lensEffect = new BABYLON.LensRenderingPipeline('lens', {
+    //   edge_blur: 1.0,
+    //   chromatic_aberration: 1.0,
+    //   distortion: 1.0,
+    //   dof_focus_distance: 150,
+    //   dof_aperture: 6.0,			// set this very high for tilt-shift effect
+    //   grain_amount: 1.0,
+    //   dof_pentagon: true,
+    //   dof_gain: 1.0,
+    //   dof_threshold: 1.0,
+    //   dof_darken: 0.25
+    // }, scene, 1.0, scene.activeCamera);
 
+     scene.fogEnabled = true;
+     scene.fogMode = BABYLON.Scene.FOGMODE_LINEAR;
+     scene.fogStart = 200.0; // The distance from the camera where fog starts
+     scene.fogEnd = 2000.0; // The distance from the camera where fog fully obscures objects
+     scene.fogColor = new BABYLON.Color3(0.1, 0.1, 0.1); // Adjust the color to match the scene's background/skybox
+    scene.ambientColor = new BABYLON.Color3(0.3, 0.3, 0.3)
 
-    scene.collisionsEnabled = true;
+    // Enable depth rendering for depth of field effect
+
     // scene.debugLayer.show();
     //return scene and meshList
     return scene;
@@ -233,6 +499,9 @@
     });
   })
 
+
+  scene.collisionsEnabled = true;
+
   engine.runRenderLoop(function () {
     scene.render();
   });
@@ -247,67 +516,49 @@
   All following functions are associated with setting up the map. E.g., creating the camera,
    */
 
-  // Detect when keys are pressed down
-  window.addEventListener('keydown', function(event) {
-    keysPressed[event.key] = true;
-  });
-
-  // Detect when keys are released
-  window.addEventListener('keyup', function(event) {
-    keysPressed[event.key] = false;
-  });
 
 
-  //Create the camera
-  function createCamera(scene, canvas) {
-    let initialCameraPosition = new BABYLON.Vector3(0,0,-450);
-    //let initialCameraPosition = BABYLON.Vector3.Zero();
-    //let camera = new BABYLON.ArcRotateCamera("Camera", -Math.PI / 2, Math.PI / 2.5, 2, initialCameraPosition, scene);
-    let camera = new BABYLON.UniversalCamera("UniversalCamera", initialCameraPosition, scene);
-    let light = new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(1, 1, 0), scene);
-    light.intensity = 1.2; // Increase intensity (default is 1)
-
-    camera.attachControl(canvas, true);
-
-    // Enable WASD controls
-    camera.keysUp.push(87); // W
-    camera.keysDown.push(83); // S
-    camera.keysLeft.push(65); // A
-    camera.keysRight.push(68); // D
-
-// Adjust camera speed and sensitivity
-    camera.speed = 10;
-    camera.angularSensitivity = 1500;
-
-
-    camera.checkCollisions = true;
-    camera.ellipsoid = new BABYLON.Vector3(1, 1, 1); // Adjust the size as necessary
-
-// Listen to mouse wheel scroll
-    window.addEventListener("wheel", function(event) {
-      var delta = 0;
-      if (event.deltaY) {
-        delta = event.deltaY;
-      } else if (event.detail) {
-        delta = -event.detail;
-      }
-
-      if (delta > 0) {
-        camera.fov += 0.1;
-      } else if (delta < 0) {
-        camera.fov -= 0.1;
-      }
-
-      // Clamp FOV to a specific range to prevent too much zoom in or out
-      camera.fov = BABYLON.Scalar.Clamp(camera.fov, 0.1, Math.PI / 2);
-    });
-
-    return camera;
+  // Create the Universal Camera
+  function createUniversalCamera(scene, canvas) {
+    let initialCameraPosition = new BABYLON.Vector3(40, 10, -460);
+    universalCamera = new BABYLON.UniversalCamera("UniversalCamera", initialCameraPosition, scene);
+    universalCamera.attachControl(canvas, true);
+    universalCamera.keysUp.push(87); // W
+    universalCamera.keysDown.push(83); // S
+    universalCamera.keysLeft.push(65); // A
+    universalCamera.keysRight.push(68); // D
+    universalCamera.speed = 5;
+    universalCamera.angularSensitivity = 1500;
+    universalCamera.checkCollisions = true;
+    universalCamera.ellipsoid = new BABYLON.Vector3(5, 5, 5);
   }
 
-  //Create the skybox
-  function createSkyBox(scene, assetsManager) {
+  // Create the ArcRotate Camera
+  function createArcRotateCamera(scene, canvas) {
+    let target = BABYLON.Vector3.Zero(); // Assuming you want to look at the origin
+    arcRotateCamera = new BABYLON.ArcRotateCamera("ArcRotateCamera", -Math.PI / 2, Math.PI / 2.5, 10, target, scene);
+    arcRotateCamera.attachControl(canvas, true);
 
+    // Optional: Adjust properties similar to the universal camera if needed
+  }
+
+
+  function switchCamera(scene) {
+    console.log("Current active camera: ", scene.activeCamera.name);
+    if (scene.activeCamera === universalCamera) {
+      scene.activeCamera = arcRotateCamera;
+      arcRotateCamera.position = universalCamera.position;
+      arcRotateCamera.attachControl(scene.getEngine().getRenderingCanvas(), true);
+    } else {
+      scene.activeCamera = universalCamera;
+      universalCamera.position = arcRotateCamera.position;
+      universalCamera.setTarget(lastSelectedMesh.position)
+      universalCamera.attachControl(scene.getEngine().getRenderingCanvas(), true);
+    }
+  }
+
+
+  function createSkyBox(scene, assetsManager) {
     var cubeTextureTask = assetsManager.addCubeTextureTask("skyboxTask", "http://localhost:8080/skybox/space3bg", [
       "_px.jpg",
       "_nx.jpg",
@@ -316,9 +567,8 @@
       "_pz.jpg",
       "_nz.jpg"
     ]);
-    // Create a skybox with the JPG image
-    cubeTextureTask.onSuccess = function (task) {
 
+    cubeTextureTask.onSuccess = function (task) {
       let skybox = BABYLON.Mesh.CreateBox("skyBox", 1500.0, scene);
       let skyboxMaterial = new BABYLON.StandardMaterial("skyBox", scene);
       skyboxMaterial.backFaceCulling = false;
@@ -328,12 +578,46 @@
       skybox.material = skyboxMaterial;
       skybox.isPickable = false;
 
-      var boundary = BABYLON.MeshBuilder.CreateBox("boundary", {size: 1500}, scene); // Adjust size to match your skybox
-      boundary.isVisible = false;
-      boundary.checkCollisions = true;
+      // Define the size of the boundary
+      var size = 1500;
+      var thickness = 10; // Thickness of the walls
 
-// Set the JPG image as the environment texture
-    //scene.environmentTexture = skyboxMaterial.reflectionTexture;
+      // Function to create a wall
+      function createWall(name, position, rotation, size) {
+        var wall = BABYLON.MeshBuilder.CreateBox(name, {width: size.width, height: size.height, depth: thickness}, scene);
+        wall.position = position;
+        wall.rotation = rotation;
+        wall.isVisible = false;
+        wall.checkCollisions = true;
+      }
+
+      // Wall dimensions
+      var wallHeight = size;
+      var wallWidth = size;
+
+      // Positions and rotations for the walls
+      var positions = [
+        new BABYLON.Vector3(0, 0, -size / 2), // Front
+        new BABYLON.Vector3(0, 0, size / 2), // Back
+        new BABYLON.Vector3(-size / 2, 0, 0), // Left
+        new BABYLON.Vector3(size / 2, 0, 0), // Right
+        new BABYLON.Vector3(0, -size / 2, 0), // Bottom
+        new BABYLON.Vector3(0, size / 2, 0) // Top
+      ];
+
+      var rotations = [
+        new BABYLON.Vector3(0, 0, 0), // Front
+        new BABYLON.Vector3(0, Math.PI, 0), // Back
+        new BABYLON.Vector3(0, Math.PI / 2, 0), // Left
+        new BABYLON.Vector3(0, -Math.PI / 2, 0), // Right
+        new BABYLON.Vector3(Math.PI / 2, 0, 0), // Bottom
+        new BABYLON.Vector3(-Math.PI / 2, 0, 0) // Top
+      ];
+
+      // Create the walls
+      for (var i = 0; i < positions.length; i++) {
+        createWall("wall" + i, positions[i], rotations[i], {width: wallWidth, height: wallHeight});
+      }
     }
   }
 
@@ -360,19 +644,27 @@
     }
   }
 
-
   //Zoom in on mesh upon click
   function applyZoom(mesh,camera) {
     if (!mesh.actionManager) {
       mesh.actionManager = new BABYLON.ActionManager(mesh.getScene());
     }
 
+    console.log("Applied zoom to camera", camera.name);
+
     mesh.actionManager.registerAction(
             new BABYLON.ExecuteCodeAction(
                     BABYLON.ActionManager.OnPickTrigger,
                     function (event) {
+
+                      if (scene.activeCamera === universalCamera) {
+                        switchCamera(scene);
+                      }
+
+
                       var pickedMesh = event.meshUnderPointer;
                       if (pickedMesh === mesh) {
+                        lastSelectedMesh = mesh;
                         var angle =  Math.PI / 4; // 225 degrees
                         var distance = getLongestSideOfMesh(mesh).length * 3; // distance from the mesh
 
@@ -400,6 +692,7 @@
 
                         ease.setEasingMode(BABYLON.EasingFunction.EASINGMODE_EASEINOUT);
 
+
                         // var animationsCompleted = 0; // Counter to track completed animations
                         //
                         // // Function to increment counter and check if both animations are complete
@@ -410,30 +703,52 @@
                         //   }
                         // };
 
+                       //  firstAnimationDone = false;
+                       //  secondAnimationDone = false;
+                       //
+                       //  var onAnimationEnd1 = function () {
+                       //    console.log("First animation done");
+                       //    firstAnimationDone = true;
+                       //      if (firstAnimationDone && secondAnimationDone) {
+                       //       switchCamera(scene);
+                       //      }
+                       // };
+                       //
+                       //  var onAnimationEnd2 = function () {
+                       //    console.log("Second animation done")
+                       //    secondAnimationDone = true;
+                       //    if (firstAnimationDone && secondAnimationDone) {
+                       //      switchCamera(scene);
+                       //    }
+                       //  };
+
+
                         BABYLON.Animation.CreateAndStartAnimation(
                                 'at4',
-                                camera,
+                                scene.activeCamera,
                                 'position',
                                 speed,
                                 120,
-                                camera.position,
+                                scene.activeCamera.position,
                                 camEndPos,
                                 0,
                                 ease
-                             //   onAnimationEnd
+                                // ,
+                                // onAnimationEnd1
                         );
 
                         BABYLON.Animation.CreateAndStartAnimation(
                                 'at5',
-                                camera,
+                                scene.activeCamera,
                                 'target',
                                 speed,
                                 120,
-                                camera.target,
+                                scene.activeCamera.target,
                                 targetEndPos,
                                 0,
                                 ease
-                               // onAnimationEnd
+                                // ,
+                                // onAnimationEnd2
                         );
                       }
                     }
@@ -506,7 +821,10 @@
             console.log(meshContent.hasOwnProperty(pickResult.pickedMesh.name)); // false if not in our object
             console.log(pickResult.pickedMesh.name);
             console.log("Mesh: " + pickResult.pickedMesh.name + "; ID: " + meshContent[pickResult.pickedMesh.name]);
-            document.getElementById("modal-iframe").innerHTML = "<iframe src=\"http://localhost:63342/graveyard_of_ships/" + meshContent[pickResult.pickedMesh.name] + "\" title=\"Modal\"frameborder=\"0\" style=\"overflow:hidden;overflow-x:hidden;overflow-y:hidden;height:100%;width:100%;position:absolute;top:40px;left:0px;right:0px;bottom:0px\" height=\"100%\" width=\"100%\"></iframe>"
+            document.getElementById("modal-iframe").innerHTML = "<iframe src=\"http://localhost:63342/graveyard_of_ships/" +
+                    meshContent[pickResult.pickedMesh.name] +
+                    "\" title=\"Modal\"frameborder=\"0\" style=" +
+                    "height:100%;width:100%;position:absolute;top:0px;left:0px;right:0px;bottom:0px\"></iframe>"
           }
         }
       }, 1000);
