@@ -537,6 +537,8 @@
   function createArcRotateCamera(scene, canvas) {
     let target = BABYLON.Vector3.Zero(); // Assuming you want to look at the origin
     arcRotateCamera = new BABYLON.ArcRotateCamera("ArcRotateCamera", -Math.PI / 2, Math.PI / 2.5, 10, target, scene);
+    arcRotateCamera.checkCollisions = true;
+    arcRotateCamera.ellipsoid = new BABYLON.Vector3(5, 5, 5);
     arcRotateCamera.attachControl(canvas, true);
 
     // Optional: Adjust properties similar to the universal camera if needed
