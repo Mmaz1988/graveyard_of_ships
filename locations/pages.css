@@ -1,0 +1,105 @@
+#container {
+    position: relative; /* or fixed if you want it to be placed relative to the viewport */
+    height: 705px;
+    width: 1200px;
+    border: 2px solid #8A959E; /* Your existing styles */
+    overflow: hidden;
+}
+
+#image, #canvas, #selectionCanvas {
+
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.canvas {
+    display: none;
+}
+
+.canvas.show {
+    display: block;
+}
+
+* {
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+/* Style the tab buttons */
+.tab button {
+    background-color: #f2f2f2;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    padding: 10px 20px;
+    font-size: 18px;
+    width: 33%;
+}
+
+.map-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center children horizontally */
+    justify-content: center; /* Center children vertically */
+    width: 100%;
+    height: 100%; /* Adjust the height as needed to fit the content */
+}
+
+/* Adjustments to button container for spacing */
+.button-container {
+    width: 100%; /* Take full width of parent */
+    text-align: center; /* Center buttons if needed */
+    padding-top: 20px; /* Add space above the buttons, adjust as needed */
+}
+
+.modal-container {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+/* Change background color of active tab button */
+.tab button.active {
+    background-color: #ddd;
+}
+
+.google-slides-container {
+    display: flex;
+    justify-content: center; /* Center horizontally */
+    align-items: center; /* Center vertically */
+    height: 100%; /* Ensure the container has a height */
+}
+
+.google-slides-container iframe{
+    position: absolute;
+    width: 80%;
+    height: 80%;
+    /* Remove margin, top, and left if using flexbox and transform for centering */
+    transform: translate(-50%, -50%); /* Center the element precisely */
+    top: 50%; /* Set top to 50% of the container's height */
+    left: 50%; /* Set left to 50% of the container's width */
+}
+
+/* Style the tab content */
+.tabcontent {
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+    /* overflow: hidden; */
+    display: none;
+    padding: 20px;
+    border: 1px solid #ddd;
+}
+
+/* Show the selected tab content */
+.tabcontent.show {
+    display: block;
+}
