@@ -5,17 +5,33 @@
 
   <script src="https://cdn.babylonjs.com/babylon.js"></script>
   <script src="https://cdn.babylonjs.com/loaders/babylonjs.loaders.min.js"></script>
+  <script src="https://cdn.babylonjs.com/materialsLibrary/babylon.gridMaterial.min.js"></script>
   <script src="https://code.jquery.com/pep/0.4.3/pep.js"></script>
 
   <link rel="stylesheet" type="text/css" href="gos_main.css">
 
+
+
   <title>Graveyard of Ships</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Babylon.js Scene</title>
+  <style>
+    /* Position the button at the lower right corner */
+    #visibilityToggle {
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      z-index: 100;
+    }
+  </style>
 
 </head>
 
 <body>
 
 <canvas id="renderCanvas" touch-action="none"></canvas>
+<button id="visibilityToggle">Toggle Visibility</button>
 
 <div class="modal">
   <div class="modal-content">
@@ -79,6 +95,77 @@
     }
   });
 
+  /*
+      const varutha_ship_task = assetsManager.addMeshTask("practice task", "", "http://localhost:8080/models/","varutha_cone_ship_join.glb");
+
+    varutha_ship_task.onSuccess = function (task) {
+
+      let varutha_ship = task.loadedMeshes[0];
+      varutha_ship.computeWorldMatrix(true);
+
+      varutha_ship.name = "varutha_ship";
+      console.log("varutha_ship:", varutha_ship)
+      // var boundingInfo = mesh.getBoundingInfo();
+      // var height = boundingInfo.maximum.y - boundingInfo.minimum.y;
+      //
+      // var desiredHeight = 170;// Height from Step 3
+      // var scaleFactor = desiredHeight / height;
+      //
+      // console.log("scale factor:", scaleFactor)
+      //
+      // mesh.scaling = new BABYLON.Vector3(scaleFactor, scaleFactor, scaleFactor);
+
+      varutha_ship.position = new BABYLON.Vector3(0, -50, 0);
+
+      console.log("Rotation: " + varutha_ship.rotation);
+
+      // Apply rotation
+      varutha_ship.rotation.y = 30 * (Math.PI / 180);
+      varutha_ship.rotation.x = 30 * (Math.PI / 180);
+      varutha_ship.rotation.z = 30 * (Math.PI / 180);
+
+      // Example rotation values, Y, X, Z
+      var alpha = 15 * (Math.PI / 180);
+      var beta = -15 * (Math.PI / 180);
+      var gamma = 0 * (Math.PI / 180);
+
+      // Create a quaternion from Euler angles
+      var quaternion = BABYLON.Quaternion.FromEulerAngles(beta, alpha, gamma);
+
+      // Assign the quaternion to the mesh
+      varutha_ship.rotationQuaternion = quaternion;
+
+      console.log("Rotation after setting: " + varutha_ship.rotation);
+
+      scene.addMesh(varutha_ship);
+      meshList.push(varutha_ship);
+
+      console.log("Set position");
+   //   varutha_ship.freezeWorldMatrix();
+    }
+   */
+
+  function createDebris(scene, assetsManager) {
+    const debrisTask = assetsManager.addMeshTask("debris task", "", "http://localhost:8080/models/", "broken_satellite.glb");
+
+    debrisTask.onSuccess = function (task) {
+      let debris = task.loadedMeshes[0];
+      debris.computeWorldMatrix(true);
+      //debris.setParent(null);
+      scene.addMesh(debris);
+      debris.position = new BABYLON.Vector3(0, 150,0);
+      debris.scaling = new BABYLON.Vector3(5, 5, 5);
+
+      debris.freezeWorldMatrix();
+      console.log("Debris:", debris);
+
+    };
+
+    debrisTask.onError = function (task, message, exception) {
+      console.log(message, exception);
+    };
+  }
+
   function createScene(onAssetsLoaded) {
     let scene = new BABYLON.Scene(engine);
     let assetsManager = new BABYLON.AssetsManager(scene);
@@ -91,8 +178,8 @@
     light.intensity = 1; // Increase intensity (default is 1)
 
 
-    createSkyBox(scene, assetsManager);
-
+     createSkyBox(scene, assetsManager);
+    //  createSphericalSkyBox(scene, assetsManager);
     // Load the assets
     //Create empty list of meshes
     const meshList = [];
@@ -108,14 +195,27 @@
       scene.addMesh(mesh);
       mesh.position = new BABYLON.Vector3(20, -50, -350);
       console.log("Set position");
-
+      mesh.name = "pirate_outpost";
       // Apply scale
-      mesh.scaling = new BABYLON.Vector3(2, 2, 2);
+      mesh.scaling = new BABYLON.Vector3(7, 7, 7);
 
       // Apply rotation
       mesh.rotation.y = -45 * (Math.PI / 180);
       mesh.rotation.x = 100 * (Math.PI / 180);
       mesh.rotation.z = 30 * (Math.PI / 180);
+
+      // Example rotation values, Y, X, Z
+      var alpha = 175 * (Math.PI / 180);
+      var beta =  -10 * (Math.PI / 180);
+      var gamma = 5 * (Math.PI / 180);
+
+      // Create a quaternion from Euler angles
+      var quaternion = BABYLON.Quaternion.FromEulerAngles(beta, alpha, gamma);
+
+      // Assign the quaternion to the mesh
+      mesh.rotationQuaternion = quaternion;
+      meshList.push(mesh);
+
 
       // Optionally freeze the world matrix after all transformations are applied
   //    mesh.freezeWorldMatrix();
@@ -147,11 +247,25 @@
 
       varutha_ship.position = new BABYLON.Vector3(0, -50, 0);
 
+      console.log("Rotation: " + varutha_ship.rotation);
+
       // Apply rotation
       varutha_ship.rotation.y = 30 * (Math.PI / 180);
       varutha_ship.rotation.x = 30 * (Math.PI / 180);
       varutha_ship.rotation.z = 30 * (Math.PI / 180);
 
+      // Example rotation values, Y, X, Z
+      var alpha = 15 * (Math.PI / 180);
+      var beta = -15 * (Math.PI / 180);
+      var gamma = 0 * (Math.PI / 180);
+
+      // Create a quaternion from Euler angles
+      var quaternion = BABYLON.Quaternion.FromEulerAngles(beta, alpha, gamma);
+
+      // Assign the quaternion to the mesh
+      varutha_ship.rotationQuaternion = quaternion;
+
+      console.log("Rotation after setting: " + varutha_ship.rotation);
 
       scene.addMesh(varutha_ship);
       meshList.push(varutha_ship);
@@ -166,14 +280,16 @@
 
 
     //Starting point
-     const box = BABYLON.MeshBuilder.CreateSphere("bumblebee", {diameter: 5}, scene);
+     const box = BABYLON.MeshBuilder.CreateSphere("bumblebee", {diameter: 50}, scene);
+     box.name = "bumblebee";
       // Create a new material with a red diffuse color
-      var red_material = new BABYLON.StandardMaterial("redMaterial", scene);
+      //var red_material = new BABYLON.StandardMaterial("redMaterial", scene);
+      var red_material = new BABYLON.GridMaterial("groundMaterial", scene);
       red_material.diffuseColor = new BABYLON.Color3(1, 0, 0); // set to red
       red_material.specularColor = new BABYLON.Color3(0, 0, 0);
       // Assume that "mesh" is the mesh object that you want to color
       box.material = red_material;
-      box.position = new BABYLON.Vector3(40, 0, -400);
+      box.position = new BABYLON.Vector3(40, 0, -500);
       scene.addMesh(box);
       meshList.push(box);
 
@@ -192,6 +308,7 @@
 
     //metal crusher nest
     const box2 = BABYLON.MeshBuilder.CreateSphere("metal_crusher_nest", {diameter: 150}, scene);
+    box2.name = "metal_crusher_nest";
     // Create a new material with a red diffuse color
     var dark_material = new BABYLON.StandardMaterial("redMaterial", scene);
     dark_material.diffuseColor = new BABYLON.Color3(0.1, 0.1, 0.1); // set to red
@@ -205,10 +322,11 @@
     meshList.push(box2);
 
     //Pirate hideout
-    const box3 = BABYLON.MeshBuilder.CreateSphere("pirate_hideout", {diameter: 100}, scene);
+    const box3 = BABYLON.MeshBuilder.CreateSphere("pirate_base", {diameter: 100}, scene);
     // Create a new material with a red diffuse color
     // Assume that "mesh" is the mesh object that you want to color
     box3.material = dark_material;
+    box3.name = "pirate_base";
     box3.position = new BABYLON.Vector3(200, 100, -170);
     scene.addMesh(box3);
     meshList.push(box3);
@@ -219,6 +337,7 @@
       depth: 120  // Set the depth (length) of the box
     }, scene);
 // Create a new standard material
+    box4.name = "sleeping_beauty";
     var sleep_beaut_material = new BABYLON.StandardMaterial("myMaterial", scene);
 
 // Set the diffuse color to a light grey with a tint of red
@@ -243,6 +362,7 @@
     var ufoDome = BABYLON.MeshBuilder.CreateSphere("ufo", {diameter: 100}, scene); // This creates an ellipsoid
     //ufoDome.scaling.y = 0.3; // Flatten the ellipsoid to make it look more like a UFO
     var ufo = BABYLON.MeshBuilder.CreateSphere("ufoDome", {diameter:170, diameterX: 170, diameterY: 40}, scene);
+    ufo.name = "natural_order";
     ufoDome.position.y = 0.2; // Adjust position to sit on top of the main body
     var light_material = new BABYLON.StandardMaterial("lightMaterial",scene);
     var green_material = new BABYLON.StandardMaterial("lgreenMaterial",scene);
@@ -263,7 +383,7 @@
       // box2.position = new BABYLON.Vector3(0, 0, 5);
       // scene.addMesh(box2);
       // meshList.push(box2);
-      // edgeList.push([box.position, box2.position]);
+
 
     //   const centralShip = BABYLON.MeshBuilder.CreateCylinder("cone", {
     //     height: 170,
@@ -290,6 +410,13 @@
   /*Sun, taken from: https://www.babylonjs-playground.com/#YSQLI3#0 (11.03.2024)s
   */
 
+
+    /**
+     * Create non-interactive meshes
+     */
+
+    createDebris(scene,assetsManager)
+
     // Create a particle system
     var surfaceParticles = new BABYLON.ParticleSystem("surfaceParticles", 1600, scene);
     var flareParticles = new BABYLON.ParticleSystem("flareParticles", 20, scene);
@@ -304,7 +431,7 @@
 
     // Create core sphere
     var coreSphere = BABYLON.MeshBuilder.CreateSphere("coreSphere", {diameter: 500, segments: 64}, scene);
-    coreSphere.position = new BABYLON.Vector3(750, 750,750);
+    coreSphere.position = new BABYLON.Vector3(1250, 1250,1250);
 
     // Create core material
     var coreMat = new BABYLON.StandardMaterial("coreMat", scene)
@@ -447,13 +574,51 @@
             meshList.push(task.loadedMeshes[0]);
         }
       });
+
+
+      varutha_natural_edge =[scene.getMeshByName("varutha_ship") ,scene.getMeshByName("natural_order")];
+      varutha_pirate_outpost_edge =[scene.getMeshByName("varutha_ship") ,scene.getMeshByName("pirate_outpost")];
+      varutha_pirate_base_edge =[scene.getMeshByName("varutha_ship") ,scene.getMeshByName("pirate_base")];
+      varutha_sleeping_beauty_edge =[scene.getMeshByName("varutha_ship") ,scene.getMeshByName("sleeping_beauty")];
+      varutha_metal_crusher_nest_edge =[scene.getMeshByName("varutha_ship") ,scene.getMeshByName("metal_crusher_nest")];
+      bumblebee_pirate_outpost_edge =[scene.getMeshByName("bumblebee") ,scene.getMeshByName("pirate_outpost")];
+      pirate_outpost_pirate_base_edge =[scene.getMeshByName("pirate_outpost") ,scene.getMeshByName("pirate_base")];
+
+      //(edgeList, scene, thickness, dashSize, gapSize, bufferDistance)
+
+      var thickness = 3;
+        var dashSize = 8;
+        var gapSize = 10;
+
+      createDashedCylinderLine(varutha_natural_edge,scene, thickness, dashSize , gapSize, 70, 80);
+        createDashedCylinderLine(varutha_pirate_outpost_edge,scene, thickness, dashSize , gapSize, 70, 50);
+        createDashedCylinderLine(varutha_pirate_base_edge,scene, thickness, dashSize , gapSize, 70, 60);
+        createDashedCylinderLine(varutha_sleeping_beauty_edge,scene, thickness, dashSize , gapSize, 70,50);
+        createDashedCylinderLine(varutha_metal_crusher_nest_edge,scene, thickness, dashSize , gapSize, 70, 50);
+        createDashedCylinderLine(bumblebee_pirate_outpost_edge, scene, thickness, dashSize , gapSize, 10, 10 );
+        createDashedCylinderLine(pirate_outpost_pirate_base_edge,scene, thickness, dashSize , gapSize, 10, 10);
+
+
+      // edgeList.push([scene.getMeshByName("varutha_ship") ,scene.getMeshByName("natural_order")]);
+      // edgeList.push([scene.getMeshByName("varutha_ship") ,scene.getMeshByName("pirate_outpost")]);
+      // edgeList.push([scene.getMeshByName("varutha_ship") ,scene.getMeshByName("pirate_base")]);
+      // edgeList.push([scene.getMeshByName("varutha_ship") ,scene.getMeshByName("sleeping_beauty")]);
+      // edgeList.push([scene.getMeshByName("varutha_ship") ,scene.getMeshByName("metal_crusher_nest")]);
+      // edgeList.push([scene.getMeshByName("bumblebee") ,scene.getMeshByName("pirate_outpost")]);
+      // edgeList.push([scene.getMeshByName("pirate_outpost") ,scene.getMeshByName("pirate_base")]);
+
+
       setupMeshFunctionality(meshList, scene.activeCamera);
       addInfoTolocations(scene);
 
       console.log("edge list: ", edgeList);
 
+
+
+
       // Now you can safely create your dashed lines
-      createDashedCylinderLines(edgeList, scene, 0.05, 0.175, 0.1, 0.75);
+      //(edgeList, scene, thickness, dashSize, gapSize, bufferDistance)
+     // createDashedCylinderLines(edgeList, scene, 5, 12,6 , 20);
 
       // // Call the callback function with the scene and the loaded meshList
         onAssetsLoaded(scene);
@@ -461,28 +626,18 @@
 
     assetsManager.load();
 
-    // var lensEffect = new BABYLON.LensRenderingPipeline('lens', {
-    //   edge_blur: 1.0,
-    //   chromatic_aberration: 1.0,
-    //   distortion: 1.0,
-    //   dof_focus_distance: 150,
-    //   dof_aperture: 6.0,			// set this very high for tilt-shift effect
-    //   grain_amount: 1.0,
-    //   dof_pentagon: true,
-    //   dof_gain: 1.0,
-    //   dof_threshold: 1.0,
-    //   dof_darken: 0.25
-    // }, scene, 1.0, scene.activeCamera);
 
-     scene.fogEnabled = true;
-     scene.fogMode = BABYLON.Scene.FOGMODE_LINEAR;
-     scene.fogStart = 200.0; // The distance from the camera where fog starts
-     scene.fogEnd = 2000.0; // The distance from the camera where fog fully obscures objects
-     scene.fogColor = new BABYLON.Color3(0.1, 0.1, 0.1); // Adjust the color to match the scene's background/skybox
-    scene.ambientColor = new BABYLON.Color3(0.3, 0.3, 0.3)
+
+    //  scene.fogEnabled = true;
+    //  scene.fogMode = BABYLON.Scene.FOGMODE_LINEAR;
+    //  scene.fogStart = 200.0; // The distance from the camera where fog starts
+    //  scene.fogEnd = 2500.0; // The distance from the camera where fog fully obscures objects
+    //  scene.fogColor = new BABYLON.Color3(0.1, 0.1, 0.1); // Adjust the color to match the scene's background/skybox
+    // scene.ambientColor = new BABYLON.Color3(0.3, 0.3, 0.3)
 
     // Enable depth rendering for depth of field effect
-
+    new BABYLON.AxesViewer(scene, 5);
+    const axes = new BABYLON.Debug.AxesViewer(scene, 5)
     // scene.debugLayer.show();
     //return scene and meshList
     return scene;
@@ -511,6 +666,21 @@
     engine.resize();
   });
 
+  // Function to toggle mesh visibility
+  function toggleMeshVisibility(meshList) {
+    console.log("meshList: ", meshList);
+    globalVisibility = !globalVisibility; // Toggle the global visibility state
+    meshList.forEach(mesh => {
+      mesh.setEnabled(globalVisibility); // Apply the current state to each mesh
+    });
+  }
+  let globalVisibility = true;
+  // List of meshes you want to control
+  let lines  = [];
+
+  // Setup the button to call the toggle function
+  document.getElementById('visibilityToggle').addEventListener('click', () => toggleMeshVisibility(lines));
+
 
   /*
   All following functions are associated with setting up the map. E.g., creating the camera,
@@ -520,7 +690,7 @@
 
   // Create the Universal Camera
   function createUniversalCamera(scene, canvas) {
-    let initialCameraPosition = new BABYLON.Vector3(40, 10, -460);
+    let initialCameraPosition = new BABYLON.Vector3(40, 10, -600);
     universalCamera = new BABYLON.UniversalCamera("UniversalCamera", initialCameraPosition, scene);
     universalCamera.attachControl(canvas, true);
     universalCamera.keysUp.push(87); // W
@@ -531,6 +701,10 @@
     universalCamera.angularSensitivity = 1500;
     universalCamera.checkCollisions = true;
     universalCamera.ellipsoid = new BABYLON.Vector3(5, 5, 5);
+    universalCamera.maxZ = 15000;
+
+
+
   }
 
   // Create the ArcRotate Camera
@@ -540,6 +714,20 @@
     arcRotateCamera.checkCollisions = true;
     arcRotateCamera.ellipsoid = new BABYLON.Vector3(5, 5, 5);
     arcRotateCamera.attachControl(canvas, true);
+    arcRotateCamera.maxZ = 15000;
+
+    // var lensEffect = new BABYLON.LensRenderingPipeline('lens', {
+    //   edge_blur: 0.3,
+    //   chromatic_aberration: 0.8,
+    //   distortion: 0.8,
+    //   dof_focus_distance: 50,
+    //   dof_aperture: 6.0,			// set this very high for tilt-shift effect
+    //   grain_amount: 1.0,
+    //   dof_pentagon: true,
+    //   dof_gain: 1.0,
+    //   dof_threshold: 1.0,
+    //   dof_darken: 0.25
+    // }, scene, 1.0, arcRotateCamera);
 
     // Optional: Adjust properties similar to the universal camera if needed
   }
@@ -557,21 +745,29 @@
       universalCamera.setTarget(lastSelectedMesh.position)
       universalCamera.attachControl(scene.getEngine().getRenderingCanvas(), true);
     }
+
+
+
   }
 
 
   function createSkyBox(scene, assetsManager) {
-    var cubeTextureTask = assetsManager.addCubeTextureTask("skyboxTask", "http://localhost:8080/skybox/space3bg", [
-      "_px.jpg",
-      "_nx.jpg",
-      "_py.jpg",
-      "_ny.jpg",
-      "_pz.jpg",
-      "_nz.jpg"
+    var cubeTextureTask = assetsManager.addCubeTextureTask("skyboxTask", "http://localhost:8080/skybox/nebula_space_corrected", [
+      "_right11.jpg",
+      "_top31.jpg",
+      "_front51.jpg",
+      "_left21.jpg",
+      "_bottom41.jpg",
+      "_back61.jpg"
     ]);
 
     cubeTextureTask.onSuccess = function (task) {
-      let skybox = BABYLON.Mesh.CreateBox("skyBox", 1500.0, scene);
+
+      // Define the size of the boundary
+      var size = 2500;
+      var thickness = 10; // Thickness of the walls
+
+      let skybox = BABYLON.Mesh.CreateBox("skyBox", size, scene);
       let skyboxMaterial = new BABYLON.StandardMaterial("skyBox", scene);
       skyboxMaterial.backFaceCulling = false;
       skyboxMaterial.reflectionTexture = cubeTextureTask.texture;
@@ -580,13 +776,12 @@
       skybox.material = skyboxMaterial;
       skybox.isPickable = false;
 
-      // Define the size of the boundary
-      var size = 1500;
-      var thickness = 10; // Thickness of the walls
+
 
       // Function to create a wall
       function createWall(name, position, rotation, size) {
         var wall = BABYLON.MeshBuilder.CreateBox(name, {width: size.width, height: size.height, depth: thickness}, scene);
+        wall.position = position;
         wall.position = position;
         wall.rotation = rotation;
         wall.isVisible = false;
@@ -616,10 +811,43 @@
         new BABYLON.Vector3(-Math.PI / 2, 0, 0) // Top
       ];
 
+      skybox.infiniteDistance = true;
+
       // Create the walls
       for (var i = 0; i < positions.length; i++) {
         createWall("wall" + i, positions[i], rotations[i], {width: wallWidth, height: wallHeight});
       }
+    }
+  }
+
+  function createSphericalSkyBox(scene, assetsManager) {
+    var sphereTextureTask = assetsManager.addTextureTask("skyboxSphereTask", "http://localhost:8080/skybox/purple_nebula.dds");
+
+    sphereTextureTask.onSuccess = function (task) {
+
+      // Define the radius of the skybox sphere
+      var radius = 1250;
+
+      let skybox = BABYLON.Mesh.CreateSphere("skyBox", 32, radius * 2, scene);
+      let skyboxMaterial = new BABYLON.StandardMaterial("skyBox", scene);
+      skyboxMaterial.backFaceCulling = false;
+      skyboxMaterial.reflectionTexture = sphereTextureTask.texture;
+      skyboxMaterial.reflectionTexture.coordinatesMode = BABYLON.Texture.FIXED_EQUIRECTANGULAR_MIRRORED_MODE; // Assuming equirectangular texture
+      skyboxMaterial.disableLighting = true;
+      skybox.material = skyboxMaterial;
+      skybox.infiniteDistance = true;
+      skybox.isPickable = false;
+
+      // Function to create a spherical wall
+      function createSphericalWall(name, radius) {
+        var wall = BABYLON.Mesh.CreateSphere(name, 32, radius * 2, scene);
+        wall.isVisible = false;
+        wall.isPickable = false;
+        wall.checkCollisions = true;
+      }
+
+      // Create a spherical wall with the same radius as the skybox
+      createSphericalWall("sphericalWall", radius);
     }
   }
 
@@ -668,6 +896,7 @@
                       if (pickedMesh === mesh) {
                         lastSelectedMesh = mesh;
                         var angle =  Math.PI / 4; // 225 degrees
+                        console.log("zoom_mesh_name", mesh.name);
                         var distance = getLongestSideOfMesh(mesh).length * 3; // distance from the mesh
 
                         // Calculate the new camera position
@@ -797,7 +1026,7 @@
   // write a function that adds functionality to each mesh in a list
   function setupMeshFunctionality(meshList, camera) {
     meshList.forEach(function (mesh) {
-
+      mesh.ignoreCameraMaxZ = true;
       if (mesh.getChildMeshes().length > 0) {
         const childMesh = mesh.getChildMeshes()[0];
         console.log(childMesh.name);
@@ -833,17 +1062,39 @@
     }
   }
 
-  function createDashedCylinderLines(edgeList, scene, thickness, dashSize, gapSize, bufferDistance) {
-    edgeList.forEach(function (edge) {
-      let startPoint = edge[0];
-      let endPoint = edge[1];
+  function createDashedCylinderLine(edge, scene, thickness, dashSize, gapSize, startBufferDistance = null, endBufferDistance = null) {
+
+      console.log("Creating dashed line between: " + edge[0].name + " and " + edge[1].name);
+      console.log("Original position of edge[0]: " + edge[0].position);
+        console.log("Original position of edge[1]: " + edge[1].position);
+      let startPointMesh = edge[0];
+      let endPointMesh = edge[1];
+
+
+    console.log("daughter position of edge[0]: " +startPointMesh.position);
+    console.log("daughter position of edge[1]: " + endPointMesh.position);
+
+      let startPoint = startPointMesh.position;
+      let endPoint = endPointMesh.position;
+
+      // Calculate or use provided buffer distances
+      if (startBufferDistance === null) {
+        startBufferDistance = getLongestSideOfMesh(startPointMesh).length / 2 + 30;
+      }
+      if (endBufferDistance === null) {
+        endBufferDistance = getLongestSideOfMesh(endPointMesh).length / 2 + 30;
+      }
+
+      console.log("Start Buffer distance: " + startBufferDistance + ", End Buffer distance: " + endBufferDistance);
 
       let direction = endPoint.subtract(startPoint).normalize();
       let fullLength = endPoint.subtract(startPoint).length();
 
-      // Adjust the start and end points by the buffer distance
-      startPoint = startPoint.add(direction.scale(bufferDistance));
-      endPoint = endPoint.subtract(direction.scale(bufferDistance));
+      // Adjust the start and end points by the individual buffer distances
+      startPoint = startPoint.add(direction.scale(startBufferDistance));
+      endPoint = endPoint.subtract(direction.scale(endBufferDistance));
+
+      console.log("Start Point: " + startPoint + ", End Point: " + endPoint);
 
       let adjustedLength = endPoint.subtract(startPoint).length();
       let normalizedDirection = endPoint.subtract(startPoint).normalize();
@@ -869,9 +1120,13 @@
 
         // Parent the dash cylinder to the dashed line
         dashCylinder.parent = dashedLine;
+
       }
-    });
-  }
+
+    lines.push(dashedLine);
+    }
+
+
 
   function createCapsule(scene, height, diameter) {
     var radius = diameter / 2;
@@ -891,8 +1146,13 @@
     var capsule = BABYLON.Mesh.MergeMeshes([cylinder, topSphere, bottomSphere], true, true, undefined, false, false);
 
     let material = new BABYLON.StandardMaterial("dashedLineMaterial", scene);
-    material.diffuseColor = new BABYLON.Color3(1, 0.9, 0.8); // Set color to white
+    material.diffuseColor = new BABYLON.Color3(0.8, 0.8, 0.8); // Set color to white
+    material.emissiveColor = new BABYLON.Color3(0.8, 0.8, 0.8);
+    //material.disableLighting = true;
     capsule.material = material;
+    //make capsule slightly transparent
+    capsule.material.alpha = 1;
+    capsule.outlineColor = new BABYLON.Color3(0, 0, 0);
 
     return capsule;
   }
