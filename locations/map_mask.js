@@ -39,33 +39,35 @@ class MapProjection {
         this.backgroundImage = new Image();
         this.backgroundImage.crossOrigin = "anonymous";
 
+
         this.backgroundImage.onload = () => {
             console.log("Loaded cover image", this.backgroundImage.width, this.backgroundImage.height, this.backgroundImage.src)
-            // const newWidth = 1200; // Set the desired width
-            // const newHeight = 705; // Set the desired height
-            // const canvasTemp = document.createElement('canvas');
-            // const ctxTemp = canvasTemp.getContext('2d');
-            //
-            // canvasTemp.width = newWidth;
-            // canvasTemp.height = newHeight;
+            const newWidth = 1200; // Set the desired width
+            const newHeight = 705; // Set the desired height
+            const canvasTemp = document.createElement('canvas');
+            const ctxTemp = canvasTemp.getContext('2d');
+
+            canvasTemp.width = newWidth;
+            canvasTemp.height = newHeight;
 
             this.ctx.drawImage(this.backgroundImage, 0, 0, this.canvas.width, this.canvas.height);
 
             // Draw the image onto the temporary canvas at the new size
-            // ctxTemp.drawImage(this.backgroundImage, 0, 0, newWidth, newHeight);
-            //
+             ctxTemp.drawImage(this.backgroundImage, 0, 0, newWidth, newHeight);
+
             // // Create a pattern from the downscaled canvas
-            // const pattern = this.ctx.createPattern(canvasTemp, 'repeat');
-            // this.ctx.fillStyle = pattern;
-            // console.log("Pattern", pattern)
-            // this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+             const pattern = this.ctx.createPattern(canvasTemp, 'repeat');
+             this.ctx.fillStyle = pattern;
+             console.log("Pattern", pattern)
+            this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
             this.saveCanvasState();
         };
-        this.backgroundImage.onerror = () => {
-            console.error("Failed to load the background image.");
-        };
+        // this.backgroundImage.onerror = () => {
+        //     console.error("Failed to load the background image.");
+        // };
 
         this.backgroundImage.src = map_mask;
+        this.ctx.drawImage(this.backgroundImage, 0, 0, 1200, 705);
 
         this.canvasStates = [];
 
