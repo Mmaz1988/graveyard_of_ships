@@ -23,16 +23,16 @@
 </div>
 
 <div id="tab2" class="tabcontent">
-  <div class="map-container">
-  <div id="container">
-    <img id="image" alt="Your Image" draggable="false" />
-    <canvas id="canvas" width="1200" height="705"></canvas>
-    <canvas id="selectionCanvas" width="1200" height="705"></canvas>
+  <div id="map-container1" class="map-container">
+  <div id="container1" class="container">
+    <img class="image" alt="Your Image" draggable="false" />
+    <canvas class="baseCanvas" width="1200" height="705"></canvas>
+    <canvas class="selectionCanvas" width="1200" height="705"></canvas>
   </div>
   <div class="button-container">
-  <button id="undoButton">Undo</button>
-  <button id="clearButton">Hide</button>
-  <button id="transparentButton">Clear</button>
+  <button class="undoButton">Undo</button>
+  <button class="clearButton">Hide</button>
+  <button class="transparentButton">Clear</button>
   </div>
   </div>
 </div>
@@ -56,9 +56,9 @@
     document.getElementById('slidesIframe').src = slides;
   });
 
-  document.addEventListener('DOMContentLoaded', (event) => {
-    document.getElementById('image').src = map;
-  });
+  // document.addEventListener('DOMContentLoaded', (event) => {
+  //   document.getElementById('image').src = map;
+  // });
 
   /*
   Logic for switching tabs including loading the map if the corresponding tab is loaded
@@ -78,7 +78,8 @@
     document.getElementById(tabName).classList.add("show");
     evt.currentTarget.classList.add("active");
     if (!canvasInitialized) {
-      initializeCanvas(map_mask);
+      console.log("Initializing canvas");
+      initializeCanvas(map, map_mask, "map-container1");
       canvasInitialized = true;
     }
   }
