@@ -6,6 +6,7 @@
 
   <link rel="stylesheet" type="text/css" href="pages.css">
 
+
 </head>
 
 <body>
@@ -23,6 +24,7 @@
 </div>
 
 <div id="tab2" class="tabcontent">
+  <div>
   <div id="map-container1" class="map-container">
   <div id="container1" class="container">
     <img class="image" alt="Your Image" draggable="false" />
@@ -35,6 +37,21 @@
   <button class="transparentButton">Clear</button>
   </div>
   </div>
+</div>
+  <div>
+  <div id="map-container2" class="map-container">
+    <div id="container2" class="container">
+      <img class="image" alt="Your Image" draggable="false" />
+      <canvas class="baseCanvas" width="1200" height="705"></canvas>
+      <canvas class="selectionCanvas" width="1200" height="705"></canvas>
+    </div>
+    <div class="button-container">
+      <button class="undoButton">Undo</button>
+      <button class="clearButton">Hide</button>
+      <button class="transparentButton">Clear</button>
+    </div>
+  </div>
+  </div>
 
 </div>
 
@@ -43,8 +60,10 @@
   <h2>Tab 3 Content</h2>
   <p>This is the content of tab 3.</p>
 </div>
+
 </div>
 </body>
+
 <script src ="map_mask.js"></script>
 
 <script>
@@ -52,6 +71,8 @@
   const slides = "https://docs.google.com/presentation/d/1WVL0ksw219dtiXNCsRS250UoRGEDB8qeIpn9Uv_b8_w/embed?start=false&loop=false&delayms=3000"
   const map = "http://localhost:8080/maps/sewer_full.png"
   const map_mask = "http://localhost:8080/maps/sewer_mask.png"
+
+
 
   document.addEventListener('DOMContentLoaded', (event) => {
     document.getElementById('slidesIframe').src = slides;
@@ -81,6 +102,7 @@
     if (!canvasInitialized) {
       console.log("Initializing canvas");
       initializeCanvas(map, map_mask, "map-container1");
+      initializeCanvas(map, map_mask, "map-container2");
       canvasInitialized = true;
     }
   }

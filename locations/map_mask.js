@@ -16,18 +16,18 @@ class MapProjection {
 
 
     init(map, map_mask) {
-        console.log("Map container", this.container)
-        console.log("query selector", this.container.querySelector('.container'))
+        //console.log("Map container", this.container)
+        //console.log("query selector", this.container.querySelector('.container'))
         this.map_container = this.container.querySelector('.container');
-        console.log("Map container", this.map_container)
+        //console.log("Map container", this.map_container)
         this.image = this.container.querySelector('.image');
         this.image.src = map;
 
-        console.log("Image", this.image)
+        //console.log("Image", this.image)
         this.canvas = this.container.querySelector('.baseCanvas');
-        console.log("Canvas", this.canvas)
+        //console.log("Canvas", this.canvas)
         this.selectionCanvas = this.container.querySelector('.selectionCanvas');
-        console.log("Selection canvas", this.selectionCanvas)
+        //console.log("Selection canvas", this.selectionCanvas)
         this.undoButton = this.container.querySelector('.undoButton');
         this.clearButton = this.container.querySelector('.clearButton');
         this.transparentButton = this.container.querySelector('.transparentButton');
@@ -54,7 +54,7 @@ class MapProjection {
             canvasTemp.width = newWidth;
             canvasTemp.height = newHeight;
 
-            console.log("Canvas vs img.",canvasTemp.width, canvasTemp.height, this.backgroundImage.width, this.backgroundImage.height, this.backgroundImage.src)
+         //   console.log("Canvas vs img.",canvasTemp.width, canvasTemp.height, this.backgroundImage.width, this.backgroundImage.height, this.backgroundImage.src)
 
             this.ctx.drawImage(this.backgroundImage, 0, 0, this.canvas.width, this.canvas.height);
 
@@ -72,8 +72,8 @@ class MapProjection {
         //     console.error("Failed to load the background image.");
         // };
 
-        this.backgroundImage.src = map_mask;
-        this.ctx.drawImage(this.backgroundImage, 0, 0, 1200, 705);
+        this.backgroundImage.src = map_mask + "?nocache=" + new Date().getTime();
+      //  this.ctx.drawImage(this.backgroundImage, 0, 0, 1200, 705);
 
         this.canvasStates = [];
 
@@ -234,8 +234,6 @@ class MapProjection {
         this.saveCanvasState = this.saveCanvasState.bind(this);
         this.clearCanvas = this.clearCanvas.bind(this);
         this.drawSelectionRect = this.drawSelectionRect.bind(this);
-       this.bindEvents = this.bindEvents.bind(this);
-
     }
 }
 
