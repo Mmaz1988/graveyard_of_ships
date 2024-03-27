@@ -16,6 +16,10 @@ class MapProjection {
 
 
     init(map, map_mask) {
+        console.log("Map container", this.container)
+        console.log("query selector", this.container.querySelector('.container'))
+        this.map_container = this.container.querySelector('.container');
+        console.log("Map container", this.map_container)
         this.image = this.container.querySelector('.image');
         this.image.src = map;
 
@@ -49,6 +53,8 @@ class MapProjection {
 
             canvasTemp.width = newWidth;
             canvasTemp.height = newHeight;
+
+            console.log("Canvas vs img.",canvasTemp.width, canvasTemp.height, this.backgroundImage.width, this.backgroundImage.height, this.backgroundImage.src)
 
             this.ctx.drawImage(this.backgroundImage, 0, 0, this.canvas.width, this.canvas.height);
 
@@ -130,7 +136,8 @@ class MapProjection {
 
         this.image.addEventListener('load', () => {
             console.log("Loading image", this.image.width, this.image.height, this.image.src)
-            const container = this.container;
+            const container = this.map_container;
+            console.log("Container", container, container.clientWidth, container.clientHeight)
             const imgRatio = this.image.width / this.image.height;
             const containerRatio = container.clientWidth / container.clientHeight;
             let displayedWidth, displayedHeight;
@@ -227,7 +234,7 @@ class MapProjection {
         this.saveCanvasState = this.saveCanvasState.bind(this);
         this.clearCanvas = this.clearCanvas.bind(this);
         this.drawSelectionRect = this.drawSelectionRect.bind(this);
-    //    this.bindEvents = this.bindEvents.bind(this);
+       this.bindEvents = this.bindEvents.bind(this);
 
     }
 }
