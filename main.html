@@ -565,6 +565,87 @@
    // coronaParticles.start();
   //  starsParticles.start();
 
+    /*
+    Clouds/varutha
+     */
+
+    // var fountain = BABYLON.Mesh.CreateBox("foutain", .01, scene);
+    // fountain.visibility = 0;
+    // fountain.position = new BABYLON.Vector3(0, 0, -50);
+    //
+    // // Create a particle system
+    // var particleSystem;
+    // //var useGPUVersion = false;
+    //
+    // var fogTexture = new BABYLON.Texture("https://raw.githubusercontent.com/aWeirdo/Babylon.js/master/smoke_15.png", scene);
+    //
+    //
+    // var createNewSystem = function() {
+    //   if (particleSystem) {
+    //     particleSystem.dispose();
+    //   }
+    //
+    //   // if (useGPUVersion && BABYLON.GPUParticleSystem.IsSupported) {
+    //   //   particleSystem = new BABYLON.GPUParticleSystem("particles", { capacity: 50000 }, scene);
+    //   //   particleSystem.activeParticleCount = 15000;
+    //   //   particleSystem.manualEmitCount = particleSystem.activeParticleCount;
+    //   //   particleSystem.minEmitBox = new BABYLON.Vector3(-50, 2, -50); // Starting all from
+    //   //   particleSystem.maxEmitBox = new BABYLON.Vector3(50, 2, 50); // To..
+    //   //
+    //   // } else {
+    //     particleSystem = new BABYLON.ParticleSystem("particles", 2500 , scene);
+    //     particleSystem.manualEmitCount = particleSystem.getCapacity();
+    //     particleSystem.minEmitBox = new BABYLON.Vector3(-150, -100, -100); // Starting all from
+    //     particleSystem.maxEmitBox = new BABYLON.Vector3(150, 100, 100); // To...
+    //  // }
+    //
+    //
+    //   particleSystem.particleTexture = fogTexture.clone();
+    //   particleSystem.emitter = fountain;
+    //
+    //   particleSystem.color1 = new BABYLON.Color4(0.8, 0.8, 0.8, 0.1);
+    //   particleSystem.color2 = new BABYLON.Color4(.95, .95, .95, 0.15);
+    //   particleSystem.colorDead = new BABYLON.Color4(0.9, 0.9, 0.9, 0.1);
+    //   particleSystem.minSize = 20;
+    //   particleSystem.maxSize = 30;
+    //   particleSystem.minLifeTime = Number.MAX_SAFE_INTEGER;
+    //   particleSystem.emitRate = 50000;
+    //   particleSystem.blendMode = BABYLON.ParticleSystem.BLENDMODE_STANDARD;
+    //   particleSystem.gravity = new BABYLON.Vector3(0, 0, 0);
+    //   particleSystem.direction1 = new BABYLON.Vector3(0, 0, 0);
+    //   particleSystem.direction2 = new BABYLON.Vector3(0, 0, 0);
+    //   particleSystem.minAngularSpeed = -2;
+    //   particleSystem.maxAngularSpeed = 2;
+    //   particleSystem.minEmitPower = .5;
+    //   particleSystem.maxEmitPower = 1;
+    //   particleSystem.updateSpeed = 0.005;
+    //
+    //   particleSystem.start();
+    // }
+    //
+    // createNewSystem();
+
+/*
+User
+  function createNewParticleSystem(scene, fountainPosition = new BABYLON.Vector3(0, 0, -50),
+                                   emitBoxSize = {min: new BABYLON.Vector3(-150, -100, -100),
+                                                  max: new BABYLON.Vector3(150, 100, 200)},
+                                   particleSize = {min: 20, max: 30},
+                                   fogTextureUrl =
+                                           "https://raw.githubusercontent.com/aWeirdo/Babylon.js/master/
+ */
+
+    createNewSphericalParticleSystem(scene);
+
+// Smaller systems emerging close to the central one for added complexity
+//     createNewParticleSystem(scene, new BABYLON.Vector3(-150, -100, -100),
+//             500,
+//             {min: new BABYLON.Vector3(-50, -30, -30), max: new BABYLON.Vector3(50, 30, 60)},
+//             {min: 10, max: 20});
+
+
+
+
       //Functions
     assetsManager.onFinish = function (tasks) {
       tasks.forEach(function (task) {
@@ -1022,6 +1103,106 @@
       }
     });
   }
+
+  function createNewSphericalParticleSystem(scene, fountainPosition = new BABYLON.Vector3(0, 0, -50),
+                                   particleNumber = 2500,
+                                   sphereEmitterRadius = 150, // New parameter for the radius of the sphere
+                                   particleSize = {min: 20, max: 30},
+                                   fogTextureUrl = "https://raw.githubusercontent.com/aWeirdo/Babylon.js/master/smoke_15.png") {
+    var fountain = BABYLON.Mesh.CreateBox("fountain", .01, scene);
+    fountain.visibility = 0;
+    fountain.position = fountainPosition;
+
+    var particleSystem = new BABYLON.ParticleSystem("particles", particleNumber, scene);
+    particleSystem.manualEmitCount = particleSystem.getCapacity();
+
+    var fogTexture = new BABYLON.Texture(fogTextureUrl, scene);
+    particleSystem.particleTexture = fogTexture.clone();
+    particleSystem.emitter = fountain; // The fountain mesh is the emitter
+
+    // Setting the particleEmitterType to a SphereParticleEmitter
+    var sphereEmitter = new BABYLON.SphereParticleEmitter();
+    sphereEmitter.radius = sphereEmitterRadius; // Setting the radius of the sphere
+    particleSystem.particleEmitterType = sphereEmitter;
+
+    let color1 = new BABYLON.Color3.FromHexString("#cccccc");
+    let color2 = new BABYLON.Color3.FromHexString("#f2f2f2");
+    let colorDead = new BABYLON.Color3.FromHexString("#e5e5e5");
+
+    particleSystem.color1 = new BABYLON.Color4(color1.r,color1.g, color1.b, 0.1);
+    particleSystem.color2 = new BABYLON.Color4(color2.r, color2.g, color2.b, 0.15);
+    particleSystem.colorDead = new BABYLON.Color4(colorDead.r, colorDead.g, colorDead.b, 0.1);
+
+    particleSystem.minSize = particleSize.min;
+    particleSystem.maxSize = particleSize.max;
+    particleSystem.minLifeTime = Number.MAX_SAFE_INTEGER;
+    particleSystem.emitRate = 50000;
+    particleSystem.blendMode = BABYLON.ParticleSystem.BLENDMODE_STANDARD;
+    particleSystem.gravity = new BABYLON.Vector3(0, 0, 0);
+    // Directional properties are still applicable, but the sphere emitter provides a natural spread
+    particleSystem.direction1 = new BABYLON.Vector3(0, 0, 0);
+    particleSystem.direction2 = new BABYLON.Vector3(0, 0, 0);
+    particleSystem.minAngularSpeed = -2;
+    particleSystem.maxAngularSpeed = 2;
+    particleSystem.minEmitPower = .5;
+    particleSystem.maxEmitPower = 1;
+    particleSystem.updateSpeed = 0.005;
+
+    particleSystem.start();
+    return particleSystem; // Optionally return the particle system for further manipulation
+  }
+
+
+
+  function createNewParticleSystem(scene, fountainPosition = new BABYLON.Vector3(0, 0, -50),
+                                   particleNumber = 2500,
+                                   emitBoxSize = {min: new BABYLON.Vector3(-150, -100, -100),
+                                                  max: new BABYLON.Vector3(150, 100, 200)},
+                                   particleSize = {min: 20, max: 30},
+                                   fogTextureUrl =
+                                           "https://raw.githubusercontent.com/aWeirdo/Babylon.js/master/smoke_15.png") {
+    var fountain = BABYLON.Mesh.CreateBox("fountain", .01, scene);
+    fountain.visibility = 0;
+    fountain.position = fountainPosition;
+
+    var particleSystem = new BABYLON.ParticleSystem("particles", particleNumber, scene);
+    particleSystem.manualEmitCount = particleSystem.getCapacity();
+    particleSystem.minEmitBox = emitBoxSize.min; // Starting all from
+    particleSystem.maxEmitBox = emitBoxSize.max; // To...
+
+    var fogTexture = new BABYLON.Texture(fogTextureUrl, scene);
+    particleSystem.particleTexture = fogTexture.clone();
+    particleSystem.emitter = fountain;
+
+    let color1 = new BABYLON.Color3.FromHexString("#cccccc");
+    let color2 = new BABYLON.Color3.FromHexString("#f2f2f2");
+    let colorDead = new BABYLON.Color3.FromHexString("#e5e5e5");
+
+    particleSystem.color1 = new BABYLON.Color4(color1.r,color1.g, color1.b, 0.1);
+    particleSystem.color2 = new BABYLON.Color4(color2.r, color2.g, color2.b, 0.15);
+    particleSystem.colorDead = new BABYLON.Color4(colorDead.r, colorDead.g, colorDead.b, 0.1);
+
+    //particleSystem.color2 = new BABYLON.Color4(.95, .95, .95, 0.15);
+    //particleSystem.colorDead = new BABYLON.Color4(0.9, 0.9, 0.9, 0.1);
+    particleSystem.minSize = particleSize.min;
+    particleSystem.maxSize = particleSize.max;
+    particleSystem.minLifeTime = Number.MAX_SAFE_INTEGER;
+    particleSystem.emitRate = 50000;
+    particleSystem.blendMode = BABYLON.ParticleSystem.BLENDMODE_STANDARD;
+    particleSystem.gravity = new BABYLON.Vector3(0, 0, 0);
+    particleSystem.direction1 = new BABYLON.Vector3(0, 0, 0);
+    particleSystem.direction2 = new BABYLON.Vector3(0, 0, 0);
+    particleSystem.minAngularSpeed = -2;
+    particleSystem.maxAngularSpeed = 2;
+    particleSystem.minEmitPower = .5;
+    particleSystem.maxEmitPower = 1;
+    particleSystem.updateSpeed = 0.005;
+
+    particleSystem.start();
+    return particleSystem; // Optionally return the particle system for further manipulation
+  }
+
+
 
   // write a function that adds functionality to each mesh in a list
   function setupMeshFunctionality(meshList, camera) {
