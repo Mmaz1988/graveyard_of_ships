@@ -283,6 +283,58 @@
       console.log(message, exception);
     };
 
+    const sleeping_beauty_task = assetsManager.addMeshTask("practice task", "", "http://localhost:8080/models/","sleeping_beauty.glb");
+
+   sleeping_beauty_task.onSuccess = function (task) {
+
+      let sleeping_beauty = task.loadedMeshes[0];
+      sleeping_beauty.computeWorldMatrix(true);
+
+      sleeping_beauty.name = "sleeping_beauty";
+      console.log("Sleeping beauty:", sleeping_beauty)
+      // var boundingInfo = mesh.getBoundingInfo();
+      // var height = boundingInfo.maximum.y - boundingInfo.minimum.y;
+      //
+      // var desiredHeight = 170;// Height from Step 3
+      // var scaleFactor = desiredHeight / height;
+      //
+      // console.log("scale factor:", scaleFactor)
+      //
+      // mesh.scaling = new BABYLON.Vector3(scaleFactor, scaleFactor, scaleFactor);
+
+      sleeping_beauty.position = new BABYLON.Vector3(200, 100, 150);
+
+      console.log("Rotation: " + sleeping_beauty.rotation);
+
+      // Apply rotation
+      sleeping_beauty.rotation.y = 30 * (Math.PI / 180);
+      sleeping_beauty.rotation.x = 30 * (Math.PI / 180);
+      sleeping_beauty.rotation.z = 30 * (Math.PI / 180);
+
+      // Example rotation values, Y, X, Z
+      var alpha = -45 * (Math.PI / 180);
+      var beta = -10 * (Math.PI / 180);
+      var gamma = 60 * (Math.PI / 180);
+
+      // Create a quaternion from Euler angles
+      var quaternion = BABYLON.Quaternion.FromEulerAngles(beta, alpha, gamma);
+
+      // Assign the quaternion to the mesh
+      sleeping_beauty.rotationQuaternion = quaternion;
+
+      console.log("Rotation after setting: " + sleeping_beauty.rotation);
+
+      scene.addMesh(sleeping_beauty);
+      meshList.push(sleeping_beauty);
+
+      console.log("Set position");
+      //   varutha_ship.freezeWorldMatrix();
+    }
+
+    varutha_ship_task.onError = function (task, message, exception) {
+      console.log(message, exception);
+    };
+
 
     //Starting point
      const box = BABYLON.MeshBuilder.CreateSphere("bumblebee", {diameter: 50}, scene);
@@ -336,30 +388,30 @@
     scene.addMesh(box3);
     meshList.push(box3);
 
-    var box4 = BABYLON.MeshBuilder.CreateBox("sleeping_beauty", {
-      width: 25,  // Set the width of the box
-      height: 40, // Set the height of the box
-      depth: 120  // Set the depth (length) of the box
-    }, scene);
-// Create a new standard material
-    box4.name = "sleeping_beauty";
-    var sleep_beaut_material = new BABYLON.StandardMaterial("myMaterial", scene);
+//     var box4 = BABYLON.MeshBuilder.CreateBox("sleeping_beauty", {
+//       width: 25,  // Set the width of the box
+//       height: 40, // Set the height of the box
+//       depth: 120  // Set the depth (length) of the box
+//     }, scene);
+// // Create a new standard material
+//     box4.name = "sleeping_beauty";
+//     var sleep_beaut_material = new BABYLON.StandardMaterial("myMaterial", scene);
 
 // Set the diffuse color to a light grey with a tint of red
 // Note: BABYLON.Color3 takes RGB values between 0 and 1
-    var redTint = 0.8; // Adjust for more or less red
-    var greyBase = 0.8; // Light grey base
-    sleep_beaut_material.diffuseColor = new BABYLON.Color3(redTint, greyBase * 0.9, greyBase * 0.9); // Slightly red tinted light grey
-    box4.material = sleep_beaut_material
-    box4.specularColor = new BABYLON.Color3(0, 0, 0);
-    box4.position = new BABYLON.Vector3(200, 100, 150);
-    box4.rotation.y = -45 * (Math.PI / 180); // Rotates the box 45 degrees around the Y axis
-
-// If you want to rotate around other axes, you can similarly adjust rotation.x or rotation.z
-    box4.rotation.x = 10 * (Math.PI / 180); // Rotates the box 30 degrees around the X axis
-    //box4.rotation.z = 60 * (Math.PI / 180); // Rotates the box 60 degrees around the Z axis
-    scene.addMesh(box4)
-    meshList.push(box4)
+//     var redTint = 0.8; // Adjust for more or less red
+//     var greyBase = 0.8; // Light grey base
+//     sleep_beaut_material.diffuseColor = new BABYLON.Color3(redTint, greyBase * 0.9, greyBase * 0.9); // Slightly red tinted light grey
+//     box4.material = sleep_beaut_material
+//     box4.specularColor = new BABYLON.Color3(0, 0, 0);
+//     box4.position = new BABYLON.Vector3(200, 100, 150);
+//     box4.rotation.y = -45 * (Math.PI / 180); // Rotates the box 45 degrees around the Y axis
+//
+// // If you want to rotate around other axes, you can similarly adjust rotation.x or rotation.z
+//     box4.rotation.x = 10 * (Math.PI / 180); // Rotates the box 30 degrees around the X axis
+//     //box4.rotation.z = 60 * (Math.PI / 180); // Rotates the box 60 degrees around the Z axis
+//     scene.addMesh(box4)
+//     meshList.push(box4)
 
 
 
@@ -639,11 +691,50 @@ User
                                    fogTextureUrl =
                                            "https://raw.githubusercontent.com/aWeirdo/Babylon.js/master/
  */
-
-    createNewSphericalParticleSystem(scene, {position: new BABYLON.Vector3(0, -20, 0), sphereEmitterRadius: 130});
-    createNewSphericalParticleSystem(scene, {sphereEmitterRadius: 110,
+    var varutha_fog = {position: new BABYLON.Vector3(0, -20, 0), sphereEmitterRadius: 130}
+    var sleeping_beauty_fog = {sphereEmitterRadius: 110,
       particleColors: {color1: "#670f0f", color2: "#561313", colorDead: "#6c2424"},
-      position: new BABYLON.Vector3(200, 100, 150)});
+      position: new BABYLON.Vector3(200, 100, 150)}
+
+    var varutha_fog_system = createNewSphericalParticleSystem(scene, varutha_fog);
+    var sleeping_beauty_fog_system = createNewSphericalParticleSystem(scene, sleeping_beauty_fog);
+
+
+        function restartParticleSystem(particleSystem, settings, scene) {
+      // Dispose of the current particle system if it exists
+      if (particleSystem && particleSystem.dispose) {
+        particleSystem.dispose();
+      }
+      console.log("Restarting particle system ...");
+      // Recreate the particle system and return the new instance
+      return createNewSphericalParticleSystem(scene, settings);
+    }
+
+    // Restart the first particle system every 3 minutes
+    setInterval(() => {
+      varutha_fog_system = restartParticleSystem(varutha_fog_system,varutha_fog, scene);
+    }, 180000);
+
+// Restart the second particle system every 3 minutes, on a different schedule if desired
+    setInterval(() => {
+      console.log("Scene sleeping beauty", scene);
+      sleeping_beauty_fog_system = restartParticleSystem(sleeping_beauty_fog_system,sleeping_beauty_fog, scene);
+    }, 180000);
+
+    setInterval(() => {
+      var particleColors = {color1: "#eeeeee", color2: "#cfcfff", colorDead: "#e5e5e5"}
+      createParticleSystemAtRandomPosition(varutha_fog.position, varutha_fog.sphereEmitterRadius, particleColors, "sparks", scene);
+    }, 1500);
+
+    setInterval(() => {
+           createParticleSystemAtRandomPosition(sleeping_beauty_fog.position, sleeping_beauty_fog.sphereEmitterRadius, sleeping_beauty_fog.particleColors, "sparks1", scene);
+    }, 2500);
+
+
+
+
+
+
 
 // Smaller systems emerging close to the central one for added complexity
 //     createNewParticleSystem(scene, new BABYLON.Vector3(-150, -100, -100),
@@ -1120,46 +1211,81 @@ User
     });
   }
 
-  //For subsystems
-  function createSystem(color, type, name, scene) {
-    var particleSystem1 = new BABYLON.ParticleSystem(name, 2000, scene);
 
-    //Texture of each particle
-    particleSystem1.particleTexture = new BABYLON.Texture("https://www.babylonjs.com/assets/Flare.png", scene);
-    if (type === 0) {
-      particleSystem1.createConeEmitter(2);
-    } else if (type === 1) {
-      particleSystem1.createSphereEmitter(2);
-    }
+  function createSparkleSystem(name, color, position, scene) {
+    console.log("Creating sparkle system at position", position);
+    console.log("Name of the system", name);
+    console.log("Scene", scene);
+    var sparkleSystem = new BABYLON.ParticleSystem("sparkle", 2000, scene);
 
+    // Texture of each particle
+    sparkleSystem.particleTexture = new BABYLON.Texture("http://localhost:8080/assets/star_particle.jpg", scene);
+
+
+    sparkleSystem.createSphereEmitter(1); // Radius of the sphere
+
+    sparkleSystem.emitter = position; // the starting position
 
     // Colors of all particles
-    particleSystem1.color1 = color;
-    particleSystem1.color2 = color;
-    particleSystem1.colorDead = new BABYLON.Color4(0, 0, 0.2, 0.0);
+    color.color1 = new BABYLON.Color3.FromHexString("#d7d7d7");
+    color.color2 = new BABYLON.Color3.FromHexString("#ffffff");
+    color.colorDead = new BABYLON.Color3.FromHexString("#b6b4f8");
 
-    particleSystem1.subEmitters = [];
-    particleSystem1.minSize = 10;
-    particleSystem1.maxSize = 20;
-    particleSystem1.minLifeTime = .1;
-    particleSystem1.maxLifeTime = .2;
-    particleSystem1.manualEmitCount = 8;
-    particleSystem1.disposeOnStop = true;
-    particleSystem1.blendMode = BABYLON.ParticleSystem.BLENDMODE_ONEONE;
-    particleSystem1.minAngularSpeed = 20;
-    particleSystem1.maxAngularSpeed = 30;
-    particleSystem1.minEmitPower = 10;
-    particleSystem1.maxEmitPower = 20;
-    particleSystem1.updateSpeed = 0.005;
-    return particleSystem1;
+
+    // Configuration of particle sizes and lifetimes
+    sparkleSystem.minSize = 2;
+    sparkleSystem.maxSize = 7;
+    sparkleSystem.minLifeTime = 0.1;
+    sparkleSystem.maxLifeTime = .2;
+
+    // Emission settings
+    sparkleSystem.manualEmitCount = 4; // Number of particles emitted in one burst
+    sparkleSystem.disposeOnStop = true; // Automatically dispose the system when it stops
+    sparkleSystem.blendMode = BABYLON.ParticleSystem.BLENDMODE_ONEONE;
+
+    // Angular speed and emit power settings
+  //  sparkleSystem.minAngularSpeed = 20;
+    //sparkleSystem.maxAngularSpeed = 30;
+    sparkleSystem.minEmitPower = 1;
+    sparkleSystem.maxEmitPower = 5;
+    sparkleSystem.updateSpeed = 0.005;
+
+    // Starting the particle system
+    sparkleSystem.start();
   }
 
+  function getRandomPositionInsideSphere(center, radius) {
+    let u = Math.random();
+    let v = Math.random();
+    let theta = u * 2.0 * Math.PI;
+    let phi = Math.acos(2.0 * v - 1.0);
+    let r = Math.cbrt(Math.random()) * radius;
+    let sinTheta = Math.sin(theta);
+    let cosTheta = Math.cos(theta);
+    let sinPhi = Math.sin(phi);
+    let cosPhi = Math.cos(phi);
+    let x = r * sinPhi * cosTheta;
+    let y = r * sinPhi * sinTheta;
+    let z = r * cosPhi;
+    return new BABYLON.Vector3(x + center.x, y + center.y, z + center.z);
+  }
+
+  function createParticleSystemAtRandomPosition(center, radius, color, name, scene) {
+    // Get a random position within the specified sphere
+    let randomPosition = getRandomPositionInsideSphere(center, radius);
+
+    console.log("Creating particle system at random position: ", randomPosition.toString());
+    // Create the particle system at the random position
+    console.log("Name: ", name);
+    console.log("Scene: ", scene);
+    createSparkleSystem(name, color, randomPosition, scene);
+  }
 
   function createNewSphericalParticleSystem(scene, {position = new BABYLON.Vector3(0, 0, -50),
                                    particleNumber = 2500,
                                    sphereEmitterRadius = 150, // New parameter for the radius of the sphere
                                    particleSize = {min: 20, max: 30},
-                                   particleColors = {color1: "#cccccc", color2: "#f2f2f2", colorDead: "#e5e5e5"},
+                                   particleColors = {color1: "#eeeeee", color2: "#cfcfff", colorDead: "#e5e5e5"},
                                    fogTextureUrl = "https://raw.githubusercontent.com/aWeirdo/Babylon.js/master/smoke_15.png"}) {
 
     console.log("Creating new spherical particle system")
@@ -1198,16 +1324,16 @@ User
     particleSystem.direction2 = new BABYLON.Vector3(0, 0, 0);
     particleSystem.minAngularSpeed = -2;
     particleSystem.maxAngularSpeed = 2;
-    particleSystem.minEmitPower = .5;
-    particleSystem.maxEmitPower = 1;
+    particleSystem.minEmitPower = .1;
+    particleSystem.maxEmitPower = .5;
     particleSystem.updateSpeed = 0.005;
 
-    // Create sub emitter
-    var subEmitter = new BABYLON.SubEmitter(createSystem(new BABYLON.Color4(1, 1, 1), 1,"sparks", scene));
-// Have the sub emitter spawn the particle system when the particle dies
-    subEmitter.type = BABYLON.SubEmitterType.ATTACHED;
-
-    particleSystem.subEmitters = [subEmitter];
+//     // Create sub emitter
+//     var subEmitter = new BABYLON.SubEmitter(createSystem(new BABYLON.Color4(1, 1, 1), 1,"sparks", scene));
+// // Have the sub emitter spawn the particle system when the particle dies
+//     subEmitter.type = BABYLON.SubEmitterType.ATTACHED;
+//
+//     particleSystem.subEmitters = [subEmitter];
 
     particleSystem.start();
     return particleSystem; // Optionally return the particle system for further manipulation
@@ -1248,7 +1374,7 @@ User
     particleSystem.minSize = particleSize.min;
     particleSystem.maxSize = particleSize.max;
     particleSystem.minLifeTime = Number.MAX_SAFE_INTEGER;
-    particleSystem.emitRate = 50000;
+    particleSystem.emitRate = 100000;
     particleSystem.blendMode = BABYLON.ParticleSystem.BLENDMODE_STANDARD;
     particleSystem.gravity = new BABYLON.Vector3(0, 0, 0);
     particleSystem.direction1 = new BABYLON.Vector3(0, 0, 0);
@@ -1294,7 +1420,7 @@ User
             console.log(meshContent.hasOwnProperty(pickResult.pickedMesh.name)); // false if not in our object
             console.log(pickResult.pickedMesh.name);
             console.log("Mesh: " + pickResult.pickedMesh.name + "; ID: " + meshContent[pickResult.pickedMesh.name]);
-            document.getElementById("modal-iframe").innerHTML = "<iframe src=\"http://localhost:63343/graveyard_of_ships/" +
+            document.getElementById("modal-iframe").innerHTML = "<iframe src=\"http://localhost:63342/graveyard_of_ships/" +
                     meshContent[pickResult.pickedMesh.name] +
                     "\" title=\"Modal\"frameborder=\"0\" style=" +
                     "height:100%;width:100%;position:absolute;top:0px;left:0px;right:0px;bottom:0px\"></iframe>"
