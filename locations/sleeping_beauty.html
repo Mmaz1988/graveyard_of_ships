@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>The central station</title>
+
+  <link rel="stylesheet" type="text/css" href="pages.css">
+
+
+</head>
+
+<body>
+<div class = "modal-container">
+<div class="tab">
+  <button class="tablinks skew-right" onclick="openTab(event, 'tab1')">Info</button>
+  <button class="tablinks" onclick="openTab(event, 'tab2')">Map</button>
+  <button class="tablinks" onclick="openTab(event, 'tab3')">Secrets</button>
+</div>
+
+<div id="tab1" class="tabcontent">
+  <div class = "google-slides-container">
+<iframe id="slidesIframe" frameborder="0" allowfullscreen="true"></iframe>
+    </div>
+</div>
+
+<div id="tab2" class="tabcontent">
+  <div>
+  <div id="map-container1" class="map-container">
+  <div id="container1" class="container">
+    <img class="image" alt="Your Image" draggable="false" />
+    <canvas class="baseCanvas" width="1200" height="705"></canvas>
+    <canvas class="selectionCanvas" width="1200" height="705"></canvas>
+  </div>
+  <div class="button-container">
+  <button class="undoButton">Undo</button>
+  <button class="clearButton">Hide</button>
+  <button class="transparentButton">Clear</button>
+  </div>
+  </div>
+</div>
+  <div>
+  <div id="map-container2" class="map-container">
+    <div id="container2" class="container">
+      <img class="image" alt="Your Image" draggable="false" />
+      <canvas class="baseCanvas" width="1200" height="705"></canvas>
+      <canvas class="selectionCanvas" width="1200" height="705"></canvas>
+    </div>
+    <div class="button-container">
+      <button class="undoButton">Undo</button>
+      <button class="clearButton">Hide</button>
+      <button class="transparentButton">Clear</button>
+    </div>
+  </div>
+  </div>
+
+</div>
+
+
+<div id="tab3" class="tabcontent">
+  <h2>Tab 3 Content</h2>
+  <p>This is the content of tab 3.</p>
+</div>
+
+</div>
+</body>
+
+<script src ="map_mask.js"></script>
+
+<script>
+  //Set these links for new elements
+  const slides = "https://docs.google.com/presentation/d/1WC9qCLG6i8LNrG935OjjiaHAThyoE7jDYCT5UPX4qXI/embed?start=false&loop=false&delayms=3000"
+  const map = "http://localhost:8080/maps/sewer_full.png"
+  const map_mask = "http://localhost:8080/maps/sewer_mask.png"
+
+
+
+  document.addEventListener('DOMContentLoaded', (event) => {
+    document.getElementById('slidesIframe').src = slides;
+  });
+
+  // document.addEventListener('DOMContentLoaded', (event) => {
+  //   document.getElementById('image').src = map;
+  // });
+
+  /*
+  Logic for switching tabs including loading the map if the corresponding tab is loaded
+   */
+  let canvasInitialized = false;
+
+  function openTab(evt, tabName) {
+    var i, tabcontent, tablinks;
+    tabcontent = document.getElementsByClassName("tabcontent");
+    for (i = 0; i < tabcontent.length; i++) {
+      tabcontent[i].classList.remove("show");
+    }
+    tablinks = document.getElementsByClassName("tablinks");
+    for (i = 0; i < tablinks.length; i++) {
+      tablinks[i].classList.remove("active");
+    }
+    document.getElementById(tabName).classList.add("show");
+    evt.currentTarget.classList.add("active");
+    if (!canvasInitialized) {
+      console.log("Initializing canvas");
+      initializeCanvas(map, map_mask, "map-container1");
+      initializeCanvas(map, map_mask, "map-container2");
+      canvasInitialized = true;
+    }
+  }
+</script>
+</html>

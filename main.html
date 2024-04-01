@@ -10,6 +10,8 @@
 
   <link rel="stylesheet" type="text/css" href="gos_main.css">
 
+  <link rel="preload" href="http://localhost:8080/maps/sewer_full.png" as="image">
+  <link rel="preload" href="http://localhost:8080/maps/sewer_mask.png" as="image">
 
 
   <title>Graveyard of Ships</title>
@@ -70,9 +72,12 @@
   //Each mesh is linked to an html page describing it
   var meshContent = {
     varutha_ship_primitive0: 'locations/varutha_ship.html',
-    ship1: 'locations/ship1.html',
-    ship2: 'locations/ship2.html',
-    sphere: 'This SPHERE is really wonderful! <br/><h3>HTML tags allowed :)</h3>'
+    natural_order: 'locations/natural_order.html',
+    pirate_base: 'locations/pirate_base.html',
+    metal_crusher_nest: 'locations/metal_crusher_nest.html',
+    Korpus: 'locations/pirate_outpost.html',
+    sleeping_beauty: 'locations/sleeping_beauty.html',
+    bumblebee: 'locations/bumblebee.html'
   }
 
   // Global variables for cameras
@@ -359,9 +364,9 @@
 
 
 
-    var ufoDome = BABYLON.MeshBuilder.CreateSphere("ufo", {diameter: 100}, scene); // This creates an ellipsoid
+    var ufoDome = BABYLON.MeshBuilder.CreateSphere("ufo", {diameter: 260, slice: 0.5}, scene); // This creates an ellipsoid
     //ufoDome.scaling.y = 0.3; // Flatten the ellipsoid to make it look more like a UFO
-    var ufo = BABYLON.MeshBuilder.CreateSphere("ufoDome", {diameter:170, diameterX: 170, diameterY: 40}, scene);
+    var ufo = BABYLON.MeshBuilder.CreateSphere("ufoDome", {diameter:340, diameterX: 340, diameterY: 40}, scene);
     ufo.name = "natural_order";
     ufoDome.position.y = 0.2; // Adjust position to sit on top of the main body
     var light_material = new BABYLON.StandardMaterial("lightMaterial",scene);
@@ -373,7 +378,7 @@
     ufo.material = light_material;
     ufoDome.material = green_material;
     ufo.position = new BABYLON.Vector3(-300,100,350);
-    ufoDome.position = new BABYLON.Vector3(-300,130,350);
+    ufoDome.position = new BABYLON.Vector3(-300,100,350);
     scene.addMesh(ufo)
     scene.addMesh(ufoDome)
     meshList.push(ufo)
@@ -548,7 +553,7 @@
     surfaceMaterial.alpha = 0.7; // Adjust opacity as needed
     surfaceParticles.material = surfaceMaterial;
 
-    var flareMaterial = new BABYLON.StandardMaterial("flareMaterial", scene);
+    var flareMaterial = new BABYLON.StandardMaterial("flareMaterial", scene), sphereEmitterRadius;
     flareMaterial.alpha = 1.0; // Adjust opacity as needed
     flareParticles.material = flareMaterial;
 
@@ -635,7 +640,10 @@ User
                                            "https://raw.githubusercontent.com/aWeirdo/Babylon.js/master/
  */
 
-    createNewSphericalParticleSystem(scene);
+    createNewSphericalParticleSystem(scene, {position: new BABYLON.Vector3(0, -20, 0), sphereEmitterRadius: 130});
+    createNewSphericalParticleSystem(scene, {sphereEmitterRadius: 110,
+      particleColors: {color1: "#670f0f", color2: "#561313", colorDead: "#6c2424"},
+      position: new BABYLON.Vector3(200, 100, 150)});
 
 // Smaller systems emerging close to the central one for added complexity
 //     createNewParticleSystem(scene, new BABYLON.Vector3(-150, -100, -100),
@@ -664,20 +672,28 @@ User
       varutha_metal_crusher_nest_edge =[scene.getMeshByName("varutha_ship") ,scene.getMeshByName("metal_crusher_nest")];
       bumblebee_pirate_outpost_edge =[scene.getMeshByName("bumblebee") ,scene.getMeshByName("pirate_outpost")];
       pirate_outpost_pirate_base_edge =[scene.getMeshByName("pirate_outpost") ,scene.getMeshByName("pirate_base")];
+      pirate_outpost_metal_crusher_nest_edge =[scene.getMeshByName("pirate_outpost") ,scene.getMeshByName("metal_crusher_nest")];
+      naturalorder_metal_crusher_nest_edge =[scene.getMeshByName("natural_order") ,scene.getMeshByName("metal_crusher_nest")];
+      piratebase_sleepingbeauty_edge =[scene.getMeshByName("pirate_base") ,scene.getMeshByName("sleeping_beauty")];
+      sleepingbeauty_naturalorder_edge =[scene.getMeshByName("sleeping_beauty") ,scene.getMeshByName("natural_order")];
 
       //(edgeList, scene, thickness, dashSize, gapSize, bufferDistance)
 
-      var thickness = 3;
-        var dashSize = 8;
-        var gapSize = 10;
+      var thickness = 1;
+        var dashSize = 3;
+        var gapSize = 4;
 
-      createDashedCylinderLine(varutha_natural_edge,scene, thickness, dashSize , gapSize, 70, 80);
-        createDashedCylinderLine(varutha_pirate_outpost_edge,scene, thickness, dashSize , gapSize, 70, 50);
+      createDashedCylinderLine(varutha_natural_edge,scene, thickness, dashSize , gapSize, 50, 80);
+        createDashedCylinderLine(varutha_pirate_outpost_edge,scene, thickness, dashSize , gapSize, 60, 10);
         createDashedCylinderLine(varutha_pirate_base_edge,scene, thickness, dashSize , gapSize, 70, 60);
-        createDashedCylinderLine(varutha_sleeping_beauty_edge,scene, thickness, dashSize , gapSize, 70,50);
-        createDashedCylinderLine(varutha_metal_crusher_nest_edge,scene, thickness, dashSize , gapSize, 70, 50);
+        createDashedCylinderLine(varutha_sleeping_beauty_edge,scene, thickness, dashSize , gapSize, 50,10);
+        createDashedCylinderLine(varutha_metal_crusher_nest_edge,scene, thickness, dashSize , gapSize, 50, 50);
         createDashedCylinderLine(bumblebee_pirate_outpost_edge, scene, thickness, dashSize , gapSize, 10, 10 );
         createDashedCylinderLine(pirate_outpost_pirate_base_edge,scene, thickness, dashSize , gapSize, 10, 10);
+        createDashedCylinderLine(pirate_outpost_metal_crusher_nest_edge,scene, thickness, dashSize , gapSize, 10, 50);
+        createDashedCylinderLine(naturalorder_metal_crusher_nest_edge,scene, thickness, dashSize , gapSize, 50, 50);
+        createDashedCylinderLine(piratebase_sleepingbeauty_edge,scene, thickness, dashSize , gapSize, 50, 10);
+        createDashedCylinderLine(sleepingbeauty_naturalorder_edge,scene, thickness, dashSize , gapSize, 10, 50);
 
 
       // edgeList.push([scene.getMeshByName("varutha_ship") ,scene.getMeshByName("natural_order")]);
@@ -1104,30 +1120,68 @@ User
     });
   }
 
-  function createNewSphericalParticleSystem(scene, fountainPosition = new BABYLON.Vector3(0, 0, -50),
+  //For subsystems
+  function createSystem(color, type, name, scene) {
+    var particleSystem1 = new BABYLON.ParticleSystem(name, 2000, scene);
+
+    //Texture of each particle
+    particleSystem1.particleTexture = new BABYLON.Texture("https://www.babylonjs.com/assets/Flare.png", scene);
+    if (type === 0) {
+      particleSystem1.createConeEmitter(2);
+    } else if (type === 1) {
+      particleSystem1.createSphereEmitter(2);
+    }
+
+
+    // Colors of all particles
+    particleSystem1.color1 = color;
+    particleSystem1.color2 = color;
+    particleSystem1.colorDead = new BABYLON.Color4(0, 0, 0.2, 0.0);
+
+    particleSystem1.subEmitters = [];
+    particleSystem1.minSize = 10;
+    particleSystem1.maxSize = 20;
+    particleSystem1.minLifeTime = .1;
+    particleSystem1.maxLifeTime = .2;
+    particleSystem1.manualEmitCount = 8;
+    particleSystem1.disposeOnStop = true;
+    particleSystem1.blendMode = BABYLON.ParticleSystem.BLENDMODE_ONEONE;
+    particleSystem1.minAngularSpeed = 20;
+    particleSystem1.maxAngularSpeed = 30;
+    particleSystem1.minEmitPower = 10;
+    particleSystem1.maxEmitPower = 20;
+    particleSystem1.updateSpeed = 0.005;
+    return particleSystem1;
+  }
+
+
+  function createNewSphericalParticleSystem(scene, {position = new BABYLON.Vector3(0, 0, -50),
                                    particleNumber = 2500,
                                    sphereEmitterRadius = 150, // New parameter for the radius of the sphere
                                    particleSize = {min: 20, max: 30},
-                                   fogTextureUrl = "https://raw.githubusercontent.com/aWeirdo/Babylon.js/master/smoke_15.png") {
-    var fountain = BABYLON.Mesh.CreateBox("fountain", .01, scene);
-    fountain.visibility = 0;
-    fountain.position = fountainPosition;
+                                   particleColors = {color1: "#cccccc", color2: "#f2f2f2", colorDead: "#e5e5e5"},
+                                   fogTextureUrl = "https://raw.githubusercontent.com/aWeirdo/Babylon.js/master/smoke_15.png"}) {
+
+    console.log("Creating new spherical particle system")
+    console.log("Position: ", position)
+    console.log("Radius: ", sphereEmitterRadius)
 
     var particleSystem = new BABYLON.ParticleSystem("particles", particleNumber, scene);
     particleSystem.manualEmitCount = particleSystem.getCapacity();
 
     var fogTexture = new BABYLON.Texture(fogTextureUrl, scene);
     particleSystem.particleTexture = fogTexture.clone();
-    particleSystem.emitter = fountain; // The fountain mesh is the emitter
+
 
     // Setting the particleEmitterType to a SphereParticleEmitter
     var sphereEmitter = new BABYLON.SphereParticleEmitter();
     sphereEmitter.radius = sphereEmitterRadius; // Setting the radius of the sphere
+    particleSystem.emitter = position;
     particleSystem.particleEmitterType = sphereEmitter;
 
-    let color1 = new BABYLON.Color3.FromHexString("#cccccc");
-    let color2 = new BABYLON.Color3.FromHexString("#f2f2f2");
-    let colorDead = new BABYLON.Color3.FromHexString("#e5e5e5");
+    let color1 = new BABYLON.Color3.FromHexString(particleColors.color1);
+    let color2 = new BABYLON.Color3.FromHexString(particleColors.color2);
+    let colorDead = new BABYLON.Color3.FromHexString(particleColors.colorDead);
 
     particleSystem.color1 = new BABYLON.Color4(color1.r,color1.g, color1.b, 0.1);
     particleSystem.color2 = new BABYLON.Color4(color2.r, color2.g, color2.b, 0.15);
@@ -1147,6 +1201,13 @@ User
     particleSystem.minEmitPower = .5;
     particleSystem.maxEmitPower = 1;
     particleSystem.updateSpeed = 0.005;
+
+    // Create sub emitter
+    var subEmitter = new BABYLON.SubEmitter(createSystem(new BABYLON.Color4(1, 1, 1), 1,"sparks", scene));
+// Have the sub emitter spawn the particle system when the particle dies
+    subEmitter.type = BABYLON.SubEmitterType.ATTACHED;
+
+    particleSystem.subEmitters = [subEmitter];
 
     particleSystem.start();
     return particleSystem; // Optionally return the particle system for further manipulation
@@ -1233,7 +1294,7 @@ User
             console.log(meshContent.hasOwnProperty(pickResult.pickedMesh.name)); // false if not in our object
             console.log(pickResult.pickedMesh.name);
             console.log("Mesh: " + pickResult.pickedMesh.name + "; ID: " + meshContent[pickResult.pickedMesh.name]);
-            document.getElementById("modal-iframe").innerHTML = "<iframe src=\"http://localhost:63342/graveyard_of_ships/" +
+            document.getElementById("modal-iframe").innerHTML = "<iframe src=\"http://localhost:63343/graveyard_of_ships/" +
                     meshContent[pickResult.pickedMesh.name] +
                     "\" title=\"Modal\"frameborder=\"0\" style=" +
                     "height:100%;width:100%;position:absolute;top:0px;left:0px;right:0px;bottom:0px\"></iframe>"
