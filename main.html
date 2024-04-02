@@ -335,6 +335,58 @@
       console.log(message, exception);
     };
 
+    const pirate_base_task = assetsManager.addMeshTask("practice task", "", "http://localhost:8080/models/","pirate_base.glb");
+
+    pirate_base_task.onSuccess = function (task) {
+
+      let pirate_base = task.loadedMeshes[0];
+      pirate_base.computeWorldMatrix(true);
+
+      pirate_base.name = "pirate_base";
+      console.log("pirate_base:", pirate_base)
+      // var boundingInfo = mesh.getBoundingInfo();
+      // var height = boundingInfo.maximum.y - boundingInfo.minimum.y;
+      //
+      // var desiredHeight = 170;// Height from Step 3
+      // var scaleFactor = desiredHeight / height;
+      //
+      // console.log("scale factor:", scaleFactor)
+      //
+      // mesh.scaling = new BABYLON.Vector3(scaleFactor, scaleFactor, scaleFactor);
+
+      pirate_base.position = new BABYLON.Vector3(400, 100, -170);
+
+      console.log("Rotation: " + pirate_base.rotation);
+
+      // Apply rotation
+      // pirate_base.rotation.y = 30 * (Math.PI / 180);
+      // pirate_base.rotation.x = 30 * (Math.PI / 180);
+      // pirate_base.rotation.z = 30 * (Math.PI / 180);
+
+      // Example rotation values, Y, X, Z
+      // var alpha = -90 * (Math.PI / 180);
+      // var beta = 0 * (Math.PI / 180);
+      // var gamma = 0 * (Math.PI / 180);
+      //
+      // // Create a quaternion from Euler angles
+      // var quaternion = BABYLON.Quaternion.FromEulerAngles(beta, alpha, gamma);
+      //
+      // // Assign the quaternion to the mesh
+      // pirate_base.rotationQuaternion = quaternion;
+
+      // console.log("Rotation after setting: " + pirate_base.rotation);
+
+      scene.addMesh(pirate_base);
+      meshList.push(pirate_base);
+
+      console.log("Set position");
+      //   varutha_ship.freezeWorldMatrix();
+    }
+
+    varutha_ship_task.onError = function (task, message, exception) {
+      console.log(message, exception);
+    };
+
 
     //Starting point
      const box = BABYLON.MeshBuilder.CreateSphere("bumblebee", {diameter: 50}, scene);
@@ -379,14 +431,14 @@
     meshList.push(box2);
 
     //Pirate hideout
-    const box3 = BABYLON.MeshBuilder.CreateSphere("pirate_base", {diameter: 100}, scene);
-    // Create a new material with a red diffuse color
-    // Assume that "mesh" is the mesh object that you want to color
-    box3.material = dark_material;
-    box3.name = "pirate_base";
-    box3.position = new BABYLON.Vector3(200, 100, -170);
-    scene.addMesh(box3);
-    meshList.push(box3);
+    // const box3 = BABYLON.MeshBuilder.CreateSphere("pirate_base", {diameter: 100}, scene);
+    // // Create a new material with a red diffuse color
+    // // Assume that "mesh" is the mesh object that you want to color
+    // box3.material = dark_material;
+    // box3.name = "pirate_base";
+    // box3.position = new BABYLON.Vector3(200, 100, -170);
+    // scene.addMesh(box3);
+    // meshList.push(box3);
 
 //     var box4 = BABYLON.MeshBuilder.CreateBox("sleeping_beauty", {
 //       width: 25,  // Set the width of the box
@@ -692,7 +744,7 @@ User
                                            "https://raw.githubusercontent.com/aWeirdo/Babylon.js/master/
  */
     var varutha_fog = {position: new BABYLON.Vector3(0, -20, 0), sphereEmitterRadius: 130}
-    var sleeping_beauty_fog = {sphereEmitterRadius: 110,
+    var sleeping_beauty_fog = {sphereEmitterRadius: 80,
       particleColors: {color1: "#670f0f", color2: "#561313", colorDead: "#6c2424"},
       position: new BABYLON.Vector3(200, 100, 150)}
 
@@ -705,7 +757,7 @@ User
       if (particleSystem && particleSystem.dispose) {
         particleSystem.dispose();
       }
-      console.log("Restarting particle system ...");
+     // console.log("Restarting particle system ...");
       // Recreate the particle system and return the new instance
       return createNewSphericalParticleSystem(scene, settings);
     }
@@ -717,7 +769,7 @@ User
 
 // Restart the second particle system every 3 minutes, on a different schedule if desired
     setInterval(() => {
-      console.log("Scene sleeping beauty", scene);
+    //  console.log("Scene sleeping beauty", scene);
       sleeping_beauty_fog_system = restartParticleSystem(sleeping_beauty_fog_system,sleeping_beauty_fog, scene);
     }, 180000);
 
@@ -1213,9 +1265,9 @@ User
 
 
   function createSparkleSystem(name, color, position, scene) {
-    console.log("Creating sparkle system at position", position);
-    console.log("Name of the system", name);
-    console.log("Scene", scene);
+    // console.log("Creating sparkle system at position", position);
+    // console.log("Name of the system", name);
+    // console.log("Scene", scene);
     var sparkleSystem = new BABYLON.ParticleSystem("sparkle", 2000, scene);
 
     // Texture of each particle
@@ -1274,10 +1326,10 @@ User
     // Get a random position within the specified sphere
     let randomPosition = getRandomPositionInsideSphere(center, radius);
 
-    console.log("Creating particle system at random position: ", randomPosition.toString());
-    // Create the particle system at the random position
-    console.log("Name: ", name);
-    console.log("Scene: ", scene);
+    // console.log("Creating particle system at random position: ", randomPosition.toString());
+    // // Create the particle system at the random position
+    // console.log("Name: ", name);
+    // console.log("Scene: ", scene);
     createSparkleSystem(name, color, randomPosition, scene);
   }
 
@@ -1288,9 +1340,9 @@ User
                                    particleColors = {color1: "#eeeeee", color2: "#cfcfff", colorDead: "#e5e5e5"},
                                    fogTextureUrl = "https://raw.githubusercontent.com/aWeirdo/Babylon.js/master/smoke_15.png"}) {
 
-    console.log("Creating new spherical particle system")
-    console.log("Position: ", position)
-    console.log("Radius: ", sphereEmitterRadius)
+    // console.log("Creating new spherical particle system")
+    // console.log("Position: ", position)
+    // console.log("Radius: ", sphereEmitterRadius)
 
     var particleSystem = new BABYLON.ParticleSystem("particles", particleNumber, scene);
     particleSystem.manualEmitCount = particleSystem.getCapacity();
