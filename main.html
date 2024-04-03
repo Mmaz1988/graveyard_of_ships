@@ -71,7 +71,7 @@
   //This is a list of all meshes used in the map
   //Each mesh is linked to an html page describing it
   var meshContent = {
-    varutha_ship_primitive0: 'locations/varutha_ship.html',
+    varutha_ship: 'locations/varutha_ship.html',
     natural_order: 'locations/natural_order.html',
     pirate_base: 'locations/pirate_base.html',
     metal_crusher_nest: 'locations/metal_crusher_nest.html',
@@ -189,6 +189,55 @@
     //Create empty list of meshes
     const meshList = [];
     const edgeList = [];
+
+
+    const bumblebee_task = assetsManager.addMeshTask("bumblebee task", "", "http://localhost:8080/models/","bumblebee.glb");
+
+    bumblebee_task.onSuccess = function (task) {
+
+      let bumblebee = task.loadedMeshes[0];
+      bumblebee.computeWorldMatrix(true);
+
+      bumblebee.name = "bumblebee";
+      console.log("bumblebee:", bumblebee)
+      // var boundingInfo = mesh.getBoundingInfo();
+      // var height = boundingInfo.maximum.y - boundingInfo.minimum.y;
+      //
+      // var desiredHeight = 170;// Height from Step 3
+      // var scaleFactor = desiredHeight / height;
+      //
+      // console.log("scale factor:", scaleFactor)
+      //
+      // mesh.scaling = new BABYLON.Vector3(scaleFactor, scaleFactor, scaleFactor);
+
+      bumblebee.position = new BABYLON.Vector3(40, 0, -500);
+
+      console.log("Rotation: " + bumblebee.rotation);
+
+      // Apply rotation
+      // bumblebee.rotation.y = 30 * (Math.PI / 180);
+      // bumblebee.rotation.x = 30 * (Math.PI / 180);
+      // bumblebee.rotation.z = 30 * (Math.PI / 180);
+
+      // Example rotation values, Y, X, Z
+      var alpha = 170 * (Math.PI / 180);
+      var beta = -15 * (Math.PI / 180);
+      var gamma = 25 * (Math.PI / 180); // up down
+
+      // Create a quaternion from Euler angles
+      var quaternion = BABYLON.Quaternion.FromEulerAngles(beta, alpha, gamma);
+
+      // Assign the quaternion to the mesh
+      bumblebee.rotationQuaternion = quaternion;
+
+      console.log("Rotation after setting: " + bumblebee.rotation);
+
+      scene.addMesh(bumblebee);
+      meshList.push(bumblebee);
+
+      console.log("Set position");
+      //   varutha_ship.freezeWorldMatrix();
+    }
 
 
     const cargoMesh = assetsManager.addMeshTask("cargo task", "", "http://localhost:8080/models/","cargo.glb");
@@ -388,19 +437,19 @@
     };
 
 
-    //Starting point
-     const box = BABYLON.MeshBuilder.CreateSphere("bumblebee", {diameter: 50}, scene);
-     box.name = "bumblebee";
-      // Create a new material with a red diffuse color
-      //var red_material = new BABYLON.StandardMaterial("redMaterial", scene);
-      var red_material = new BABYLON.GridMaterial("groundMaterial", scene);
-      red_material.diffuseColor = new BABYLON.Color3(1, 0, 0); // set to red
-      red_material.specularColor = new BABYLON.Color3(0, 0, 0);
-      // Assume that "mesh" is the mesh object that you want to color
-      box.material = red_material;
-      box.position = new BABYLON.Vector3(40, 0, -500);
-      scene.addMesh(box);
-      meshList.push(box);
+    // //Starting point
+    //  const box = BABYLON.MeshBuilder.CreateSphere("bumblebee", {diameter: 50}, scene);
+    //  box.name = "bumblebee";
+    //   // Create a new material with a red diffuse color
+    //   //var red_material = new BABYLON.StandardMaterial("redMaterial", scene);
+    //   var red_material = new BABYLON.GridMaterial("groundMaterial", scene);
+    //   red_material.diffuseColor = new BABYLON.Color3(1, 0, 0); // set to red
+    //   red_material.specularColor = new BABYLON.Color3(0, 0, 0);
+    //   // Assume that "mesh" is the mesh object that you want to color
+    //   box.material = red_material;
+    //   box.position = new BABYLON.Vector3(40, 0, -500);
+    //   scene.addMesh(box);
+    //   meshList.push(box);
 
     //Pirate outpost
     // const box1 = BABYLON.MeshBuilder.CreateSphere("pirate_outpost", {diameter: 10}, scene);
@@ -1115,9 +1164,13 @@ User
   }
 
   //Zoom in on mesh upon click
-  function applyZoom(mesh,camera) {
+  function applyZoom(mesh,camera,target) {
     if (!mesh.actionManager) {
       mesh.actionManager = new BABYLON.ActionManager(mesh.getScene());
+    }
+
+    if (!target){
+      target = mesh;
     }
 
     console.log("Applied zoom to camera", camera.name);
@@ -1137,12 +1190,12 @@ User
                         lastSelectedMesh = mesh;
                         var angle =  Math.PI / 4; // 225 degrees
                         console.log("zoom_mesh_name", mesh.name);
-                        var distance = getLongestSideOfMesh(mesh).length * 3; // distance from the mesh
+                        var distance = getLongestSideOfMesh(target).length * 3; // distance from the mesh
 
                         // Calculate the new camera position
-                        var camX = mesh.getAbsolutePosition().x - distance * Math.cos(angle);
-                        var camY = mesh.getAbsolutePosition().y + distance * Math.sin(angle);
-                        var camZ = mesh.getAbsolutePosition().z - distance * Math.sin(angle);
+                        var camX = target.getAbsolutePosition().x - distance * Math.cos(angle);
+                        var camY = target.getAbsolutePosition().y + distance * Math.sin(angle);
+                        var camZ = target.getAbsolutePosition().z - distance * Math.sin(angle);
 
                         var camEndPos = new BABYLON.Vector3(camX, camY, camZ);
 
@@ -1155,7 +1208,7 @@ User
                         var targetEndPos = new BABYLON.Vector3(targetX, targetY, targetZ);
                          */
 
-                        var targetEndPos = mesh.getAbsolutePosition();
+                        var targetEndPos = target.getAbsolutePosition();
 
 
                         var speed = 45;
@@ -1338,7 +1391,8 @@ User
                                    sphereEmitterRadius = 150, // New parameter for the radius of the sphere
                                    particleSize = {min: 20, max: 30},
                                    particleColors = {color1: "#eeeeee", color2: "#cfcfff", colorDead: "#e5e5e5"},
-                                   fogTextureUrl = "https://raw.githubusercontent.com/aWeirdo/Babylon.js/master/smoke_15.png"}) {
+                                    fogTextureUrl = "https://raw.githubusercontent.com/aWeirdo/Babylon.js/master/smoke_15.png"}) {
+    // fogTextureUrl = "https://raw.githubusercontent.com/aWeirdo/Babylon.js/master/smoke_15.png"}) {
 
     // console.log("Creating new spherical particle system")
     // console.log("Position: ", position)
@@ -1374,8 +1428,8 @@ User
     // Directional properties are still applicable, but the sphere emitter provides a natural spread
     particleSystem.direction1 = new BABYLON.Vector3(0, 0, 0);
     particleSystem.direction2 = new BABYLON.Vector3(0, 0, 0);
-    particleSystem.minAngularSpeed = -2;
-    particleSystem.maxAngularSpeed = 2;
+ //   particleSystem.minAngularSpeed = -2;
+  //  particleSystem.maxAngularSpeed = 2;
     particleSystem.minEmitPower = .1;
     particleSystem.maxEmitPower = .5;
     particleSystem.updateSpeed = 0.005;
@@ -1450,7 +1504,9 @@ User
       if (mesh.getChildMeshes().length > 0) {
         const childMesh = mesh.getChildMeshes()[0];
         console.log(childMesh.name);
-        applyZoom(childMesh,camera);
+        for (let i = 0; i < mesh.getChildMeshes().length; i++) {
+          applyZoom(mesh.getChildMeshes()[i], camera, childMesh);
+        }
       } else {
         console.log(mesh.name);
         applyZoom(mesh,camera);
@@ -1466,14 +1522,22 @@ User
       setTimeout(function () {
         if (pickResult.hit) {
           console.log("pickResult.hit: " + pickResult.pickedMesh.name);
-          if (meshContent[pickResult.pickedMesh.name]) {
+          const regex = /^(.*)(_primitive\d+)$/;
+          var match = pickResult.pickedMesh.name.match(regex);
+          var poi_name = pickResult.pickedMesh.name;
+          if (match){
+            poi_name = match[1];
+          }
+
+
+            if (meshContent[poi_name]) {
             console.log("In the list");
             toggleModal();
-            console.log(meshContent.hasOwnProperty(pickResult.pickedMesh.name)); // false if not in our object
-            console.log(pickResult.pickedMesh.name);
-            console.log("Mesh: " + pickResult.pickedMesh.name + "; ID: " + meshContent[pickResult.pickedMesh.name]);
-            document.getElementById("modal-iframe").innerHTML = "<iframe src=\"http://localhost:63342/graveyard_of_ships/" +
-                    meshContent[pickResult.pickedMesh.name] +
+            console.log(meshContent.hasOwnProperty(poi_name)); // false if not in our object
+            console.log(poi_name);
+            console.log("Mesh: " + pickResult.pickedMesh.name + "; ID: " + meshContent[poi_name]);
+            document.getElementById("modal-iframe").innerHTML = "<iframe src=\"http://localhost:63343/graveyard_of_ships/" +
+                    meshContent[poi_name] +
                     "\" title=\"Modal\"frameborder=\"0\" style=" +
                     "height:100%;width:100%;position:absolute;top:0px;left:0px;right:0px;bottom:0px\"></iframe>"
           }
