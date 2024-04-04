@@ -792,13 +792,19 @@ User
                                    fogTextureUrl =
                                            "https://raw.githubusercontent.com/aWeirdo/Babylon.js/master/
  */
-    var varutha_fog = {position: new BABYLON.Vector3(0, -20, 0), sphereEmitterRadius: 130}
-    var sleeping_beauty_fog = {sphereEmitterRadius: 80,
+    const varutha_fog = {position: new BABYLON.Vector3(0, -20, 0), sphereEmitterRadius: 130}
+    const sleeping_beauty_fog = {sphereEmitterRadius: 80,
       particleColors: {color1: "#670f0f", color2: "#561313", colorDead: "#6c2424"},
       position: new BABYLON.Vector3(200, 100, 150)}
 
+
     var varutha_fog_system = createNewSphericalParticleSystem(scene, varutha_fog);
+
+
+    console.log("particleColors before", JSON.stringify(sleeping_beauty_fog.particleColors));
     var sleeping_beauty_fog_system = createNewSphericalParticleSystem(scene, sleeping_beauty_fog);
+    console.log("particleColors after", JSON.stringify(sleeping_beauty_fog.particleColors));
+
 
 
         function restartParticleSystem(particleSystem, settings, scene) {
@@ -819,6 +825,10 @@ User
 // Restart the second particle system every 3 minutes, on a different schedule if desired
     setInterval(() => {
     //  console.log("Scene sleeping beauty", scene);
+    //   console.log("Sleeping beauty fog system is restarting");
+      const sleeping_beauty_fog = {sphereEmitterRadius: 80,
+        particleColors: {color1: "#670f0f", color2: "#561313", colorDead: "#6c2424"},
+        position: new BABYLON.Vector3(200, 100, 150)}
       sleeping_beauty_fog_system = restartParticleSystem(sleeping_beauty_fog_system,sleeping_beauty_fog, scene);
     }, 180000);
 
@@ -1387,16 +1397,38 @@ User
   }
 
   function createNewSphericalParticleSystem(scene, {position = new BABYLON.Vector3(0, 0, -50),
-                                   particleNumber = 2500,
-                                   sphereEmitterRadius = 150, // New parameter for the radius of the sphere
-                                   particleSize = {min: 20, max: 30},
+                                   particleNumber = 1000,
+                                   sphereEmitterRadius = 1000, // Original value at 250 TODO see if we can spread particles further somehow
+                                   particleSize = {min: 60, max: 80},
                                    particleColors = {color1: "#eeeeee", color2: "#cfcfff", colorDead: "#e5e5e5"},
-                                    fogTextureUrl = "https://raw.githubusercontent.com/aWeirdo/Babylon.js/master/smoke_15.png"}) {
+                                    fogTextureUrl = "http://localhost:8080/assets/water3.png" }) {
     // fogTextureUrl = "https://raw.githubusercontent.com/aWeirdo/Babylon.js/master/smoke_15.png"}) {
 
     // console.log("Creating new spherical particle system")
     // console.log("Position: ", position)
     // console.log("Radius: ", sphereEmitterRadius)
+
+    // // Custom shader for particles
+    // BABYLON.Effect.ShadersStore["myParticleFragmentShader"] =
+    //         "#ifdef GL_ES\n" +
+    //         "precision highp float;\n" +
+    //         "#endif\n" +
+    //         "varying vec2 vUV;\n" +
+    //         "varying vec4 vColor;\n" +
+    //         "uniform sampler2D diffuseSampler;\n" +
+    //         "uniform float time;\n" +
+    //         "void main(void) {\n" +
+    //         "vec2 position = vUV;\n" +
+    //         "float color = 0.0;\n" +
+    //         "vec2 center = vec2(0.5, 0.5);\n" +
+    //         "color = sin(distance(position, center) * 10.0 + time * vColor.g);\n" +
+    //         "vec4 baseColor = texture2D(diffuseSampler, vUV);\n" +
+    //         "gl_FragColor = baseColor * vColor * vec4(vec3(color, color, color), 1.0);\n" +
+    //         "}\n";
+    //
+    // // Create an effect for particles using the custom shader
+    // var effect = scene.getEngine().createEffectForParticles("myParticle", ["time"]);
+
 
     var particleSystem = new BABYLON.ParticleSystem("particles", particleNumber, scene);
     particleSystem.manualEmitCount = particleSystem.getCapacity();
@@ -1408,30 +1440,31 @@ User
     // Setting the particleEmitterType to a SphereParticleEmitter
     var sphereEmitter = new BABYLON.SphereParticleEmitter();
     sphereEmitter.radius = sphereEmitterRadius; // Setting the radius of the sphere
+    sphereEmitter.radiusRange = 1;
     particleSystem.emitter = position;
     particleSystem.particleEmitterType = sphereEmitter;
 
-    let color1 = new BABYLON.Color3.FromHexString(particleColors.color1);
-    let color2 = new BABYLON.Color3.FromHexString(particleColors.color2);
-    let colorDead = new BABYLON.Color3.FromHexString(particleColors.colorDead);
+    let color1x = new BABYLON.Color3.FromHexString(particleColors.color1);
+    let color2x = new BABYLON.Color3.FromHexString(particleColors.color2);
+    let colorDeadx = new BABYLON.Color3.FromHexString(particleColors.colorDead);
 
-    particleSystem.color1 = new BABYLON.Color4(color1.r,color1.g, color1.b, 0.1);
-    particleSystem.color2 = new BABYLON.Color4(color2.r, color2.g, color2.b, 0.15);
-    particleSystem.colorDead = new BABYLON.Color4(colorDead.r, colorDead.g, colorDead.b, 0.1);
+    particleSystem.color1 = new BABYLON.Color4(color1x.r,color1x.g, color1x.b, 0.3);
+    particleSystem.color2 = new BABYLON.Color4(color2x.r, color2x.g, color2x.b, 0.2);
+    particleSystem.colorDead = new BABYLON.Color4(colorDeadx.r, colorDeadx.g, colorDeadx.b, 0.1);
 
     particleSystem.minSize = particleSize.min;
     particleSystem.maxSize = particleSize.max;
     particleSystem.minLifeTime = Number.MAX_SAFE_INTEGER;
     particleSystem.emitRate = 50000;
-    particleSystem.blendMode = BABYLON.ParticleSystem.BLENDMODE_STANDARD;
+    particleSystem.blendMode = BABYLON.ParticleSystem.BLENDMODE_ADD;
     particleSystem.gravity = new BABYLON.Vector3(0, 0, 0);
     // Directional properties are still applicable, but the sphere emitter provides a natural spread
     particleSystem.direction1 = new BABYLON.Vector3(0, 0, 0);
     particleSystem.direction2 = new BABYLON.Vector3(0, 0, 0);
  //   particleSystem.minAngularSpeed = -2;
   //  particleSystem.maxAngularSpeed = 2;
-    particleSystem.minEmitPower = .1;
-    particleSystem.maxEmitPower = .5;
+    particleSystem.minEmitPower = .3;
+    particleSystem.maxEmitPower = .9;
     particleSystem.updateSpeed = 0.005;
 
 //     // Create sub emitter
@@ -1536,7 +1569,7 @@ User
             console.log(meshContent.hasOwnProperty(poi_name)); // false if not in our object
             console.log(poi_name);
             console.log("Mesh: " + pickResult.pickedMesh.name + "; ID: " + meshContent[poi_name]);
-            document.getElementById("modal-iframe").innerHTML = "<iframe src=\"http://localhost:63343/graveyard_of_ships/" +
+            document.getElementById("modal-iframe").innerHTML = "<iframe src=\"http://localhost:63342/graveyard_of_ships/" +
                     meshContent[poi_name] +
                     "\" title=\"Modal\"frameborder=\"0\" style=" +
                     "height:100%;width:100%;position:absolute;top:0px;left:0px;right:0px;bottom:0px\"></iframe>"
