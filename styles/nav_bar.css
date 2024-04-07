@@ -1,0 +1,61 @@
+/* Position the buttons at the lower left corner, stacking them vertically */
+.sidebar-button {
+    opacity: 0.5; /* Make buttons a bit transparent */
+    position: fixed;
+    left: 0;
+    top: 50%;
+    z-index: 100;
+    transition: width 0.5s ease; /* Smooth transition for width */
+    width: 20px; /* Small width initially */
+    overflow: hidden; /* Prevent content from spilling out when button is small */
+    white-space: nowrap; /* Ensure text stays in a single line */
+    text-align: right;
+
+}
+
+
+#prologueButton {
+    /* Adjust this value based on your design needs */
+    transform: translateY(calc(-50% - 20px))  translateX(-10px) skew(-10deg);
+}
+#crewButton {
+    /* Adjust this value based on your design needs */
+    transform: translateY(calc(-50% + 40px))  translateX(-10px) skew(-10deg);
+}
+
+
+/* Offset individual buttons from the calculated center position */
+#visibilityToggle {
+    /* Move up or down from the center. Adjust the percentage as needed */
+    transform: translateY(calc(-50% + 100px))  translateX(-10px) skew(-10deg);
+}
+
+#acknowledgementsButton {
+    /* Adjust this value based on your design needs */
+    transform: translateY(calc(-50% + 160px))  translateX(-10px) skew(-10deg);
+}
+
+
+/* Shared button styles */
+.button, .skew-right {
+    font-family: 'Orbitron', sans-serif;
+    font-weight: bold;
+    border: 1px solid #64818c;
+    background-color: #c1d6ce;
+    color: #fff; /* Ensure text color is visible */
+    outline: none;
+    cursor: pointer;
+    padding: 10px 20px;
+    transform: translateX(-10px) skew(-10deg);
+}
+
+/* Expand button width on hover */
+.sidebar-button:hover {
+    width: 250px; /* Expanded width */
+    opacity: 1; /* Fully visible */ }
+
+
+.sidebar-button:active {
+    background-color: #64818c;
+    color: white;
+}
