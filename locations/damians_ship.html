@@ -38,7 +38,20 @@
   </div>
   </div>
 </div>
-
+  <div>
+  <div id="map-container2" class="map-container">
+    <div id="container2" class="container">
+      <img class="image" alt="Your Image" draggable="false" />
+      <canvas class="baseCanvas" width="1200" height="705"></canvas>
+      <canvas class="selectionCanvas" width="1200" height="705"></canvas>
+    </div>
+    <div class="button-container">
+      <button class="undoButton">Undo</button>
+      <button class="clearButton">Hide</button>
+      <button class="transparentButton">Clear</button>
+    </div>
+  </div>
+  </div>
 
 </div>
 
@@ -56,8 +69,8 @@
 <script>
   //Set these links for new elements
   const slides = "https://docs.google.com/presentation/d/10r02gu3rfqMw15ycEKQswVGV5XMJ4Io9r2uroaO3VIU/embed?start=false&loop=false&delayms=3000"
-  const map = "http://localhost:8080/maps/bumblebee_map.png"
-  const map_mask = "http://localhost:8080/maps/bumblebee_mask.png"
+  const map = "http://localhost:8080/maps/sewer_full.png"
+  const map_mask = "http://localhost:8080/maps/sewer_mask.png"
 
 
 
@@ -89,6 +102,7 @@
     if (!canvasInitialized) {
       console.log("Initializing canvas");
       initializeCanvas(map, map_mask, "map-container1");
+      initializeCanvas(map, map_mask, "map-container2");
       canvasInitialized = true;
     }
   }
