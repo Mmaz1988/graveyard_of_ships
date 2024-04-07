@@ -30,7 +30,7 @@
     padding: 10px 20px;
     font-size: 18px;
     width: 33%;
-    transform: translateX(-10px);
+    transform: translateX(-10px) skew(-10deg);
 }
 
 .button:active {

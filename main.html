@@ -9,7 +9,7 @@
   <script src="https://code.jquery.com/pep/0.4.3/pep.js"></script>
 
   <link rel="stylesheet" type="text/css" href="gos_main.css">
-
+  <link rel="stylesheet" type="text/css" href="nav_bar.css">
   <link rel="preload" href="http://localhost:8080/maps/sewer_full.png" as="image">
   <link rel="preload" href="http://localhost:8080/maps/sewer_mask.png" as="image">
 
@@ -18,7 +18,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Babylon.js Scene</title>
-  <link rel="stylesheet" type="text/css" href="nav_bar.css">
+
 
 
 </head>
@@ -26,7 +26,7 @@
 <body>
 
 <canvas id="renderCanvas" touch-action="none"></canvas>
-<button id="visibilityToggle">Toggle Visibility</button>
+<button id="visibilityToggle" class="button skew-right">Toggle visibility</button>
 
 <div class="modal">
   <div class="modal-content">
@@ -196,7 +196,7 @@
     instance.freezeWorldMatrix();
   }
 
-  function createScene() {
+  function createScene(onAssetsLoaded) {
     let scene = new BABYLON.Scene(engine);
     let assetsManager = new BABYLON.AssetsManager(scene);
 
@@ -953,10 +953,7 @@ User
       // edgeList.push([scene.getMeshByName("pirate_outpost") ,scene.getMeshByName("pirate_base")]);
 
 
-      setupMeshFunctionality(meshList, scene.activeCamera);
-      addInfoTolocations(scene);
 
-      console.log("edge list: ", edgeList);
 
 
 
@@ -968,7 +965,6 @@ User
       // // Call the callback function with the scene and the loaded meshList
        // onAssetsLoaded(scene);
 
-
     assetsManager.onFinish = function (tasks) {
 
       tasks.forEach(function (task) {
@@ -978,6 +974,11 @@ User
           meshList.push(task.loadedMeshes[0]);
         }
       });
+
+      setupMeshFunctionality(meshList, scene.activeCamera);
+      addInfoTolocations(scene);
+
+      console.log("edge list: ", edgeList);
 
       const varutha_natural_edge =[scene.getMeshByName("varutha_ship") ,scene.getMeshByName("natural_order")];
       const varutha_pirate_outpost_edge =[scene.getMeshByName("varutha_ship") ,scene.getMeshByName("pirate_outpost")];
@@ -1016,14 +1017,16 @@ User
 
       console.log("All models loaded");
         let position = new BABYLON.Vector3(50, 50, 50); // Placeholder position
-        // let position1 = new BABYLON.Vector3(100, 100, 100); // Placeholder position
-        // let position2 = new BABYLON.Vector3(150, 150, 150); // Placeholder position
-        // let position3 = new BABYLON.Vector3(200, 200, 200); // Placeholder position
-        // let position4 = new BABYLON.Vector3(250, 250, 250); // Placeholder position
+         let position1 = new BABYLON.Vector3(100, 100, 100); // Placeholder position
+        let position2 = new BABYLON.Vector3(150, 150, 150); // Placeholder position
+         let position3 = new BABYLON.Vector3(200, 200, 200); // Placeholder position
+         let position4 = new BABYLON.Vector3(250, 250, 250); // Placeholder position
 
       createInstanceFromModel("debris1", position);
-     // createInstanceFromModel("debris1", position1);
-     //   createInstanceFromModel("debris1", position2);
+      createInstanceFromModel("debris1", position1);
+        createInstanceFromModel("debris1", position2);
+        createInstanceFromModel("debris1", position3);
+        createInstanceFromModel("debris1", position4);
       };
 
     assetsManager.load();
@@ -1046,7 +1049,16 @@ User
     return scene;
   };
 
-  let scene = createScene();
+  let scene = createScene(function (loadedScene) {
+
+    loadedScene.executeWhenReady(function () {
+      // This code will be executed once the scene is fully ready
+
+      console.log("Scene loaded");
+
+
+    });
+  })
 
 
   scene.collisionsEnabled = true;
