@@ -162,7 +162,7 @@
     let scene = new BABYLON.Scene(engine);
     let assetsManager = new BABYLON.AssetsManager(scene);
 
-    scene.debugLayer.show();
+   // scene.debugLayer.show();
 
     createUniversalCamera(scene, canvas);
     createArcRotateCamera(scene, canvas);
@@ -228,7 +228,7 @@
       bumblebee.freezeWorldMatrix();
     }
 
-    const damian_task = assetsManager.addMeshTask("bumblebee task", "", "http://localhost:8080/models/","damian_ship.glb");
+    const damian_task = assetsManager.addMeshTask("damian task", "", "http://localhost:8080/models/","damian_ship.glb");
 
     damian_task.onSuccess = function (task) {
 
@@ -473,9 +473,65 @@
       pirate_base.freezeWorldMatrix();
     }
 
+    pirate_base_task.onError = function (task, message, exception) {
+      console.log(message, exception);
+    };
+
+
+    const metal_crusher_nest_task = assetsManager.addMeshTask("metal_crusher_nest", "", "http://localhost:8080/models/","metal_crusher_nest.glb");
+
+    metal_crusher_nest_task.onSuccess = function (task) {
+
+      let metal_crusher_nest = task.loadedMeshes[0];
+      //pirate_base.computeWorldMatrix(true);
+
+      metal_crusher_nest.name = "metal_crusher_nest";
+      console.log("metal_crusher_nest:", metal_crusher_nest)
+      // var boundingInfo = mesh.getBoundingInfo();
+      // var height = boundingInfo.maximum.y - boundingInfo.minimum.y;
+      //
+      // var desiredHeight = 170;// Height from Step 3
+      // var scaleFactor = desiredHeight / height;
+      //
+      // console.log("scale factor:", scaleFactor)
+      //
+      // mesh.scaling = new BABYLON.Vector3(scaleFactor, scaleFactor, scaleFactor);
+
+      metal_crusher_nest.position = new BABYLON.Vector3(-350, -150, 20);
+
+
+
+      // Apply rotation
+      // pirate_base.rotation.y = 30 * (Math.PI / 180);
+      // pirate_base.rotation.x = 30 * (Math.PI / 180);
+      // pirate_base.rotation.z = 30 * (Math.PI / 180);
+
+      // Example rotation values, Y, X, Z
+      // var alpha = -90 * (Math.PI / 180);
+      // var beta = 0 * (Math.PI / 180);
+      // var gamma = 0 * (Math.PI / 180);
+      //
+      // // Create a quaternion from Euler angles
+      // var quaternion = BABYLON.Quaternion.FromEulerAngles(beta, alpha, gamma);
+      //
+      // // Assign the quaternion to the mesh
+      // pirate_base.rotationQuaternion = quaternion;
+
+      // console.log("Rotation after setting: " + pirate_base.rotation);
+
+      scene.addMesh(metal_crusher_nest);
+      meshList.push(metal_crusher_nest);
+
+      console.log("Set position");
+      //   varutha_ship.freezeWorldMatrix();
+      metal_crusher_nest.freezeWorldMatrix();
+    }
+
     varutha_ship_task.onError = function (task, message, exception) {
       console.log(message, exception);
     };
+
+
 
     console.log("Loading debris models....")
     loadModels(scene, assetsManager, ['debris1','debris2']);
@@ -509,19 +565,19 @@
     // edgeList.push([box.position, box1.position]);
 
     //metal crusher nest
-    const box2 = BABYLON.MeshBuilder.CreateSphere("metal_crusher_nest", {diameter: 150}, scene);
-    box2.name = "metal_crusher_nest";
-    // Create a new material with a red diffuse color
-    var dark_material = new BABYLON.StandardMaterial("redMaterial", scene);
-    dark_material.diffuseColor = new BABYLON.Color3(0.1, 0.1, 0.1); // set to red
-    dark_material.specularColor = new BABYLON.Color3(0, 0, 0);
-    dark_material.alpha = 1;
-    dark_material.depth_write = true;
-    // Assume that "mesh" is the mesh object that you want to color
-    box2.material = dark_material;
-    box2.position = new BABYLON.Vector3(-350, -150, 20);
-    scene.addMesh(box2);
-    meshList.push(box2);
+    // const box2 = BABYLON.MeshBuilder.CreateSphere("metal_crusher_nest", {diameter: 150}, scene);
+    // box2.name = "metal_crusher_nest";
+    // // Create a new material with a red diffuse color
+    // var dark_material = new BABYLON.StandardMaterial("redMaterial", scene);
+    // dark_material.diffuseColor = new BABYLON.Color3(0.1, 0.1, 0.1); // set to red
+    // dark_material.specularColor = new BABYLON.Color3(0, 0, 0);
+    // dark_material.alpha = 1;
+    // dark_material.depth_write = true;
+    // // Assume that "mesh" is the mesh object that you want to color
+    // box2.material = dark_material;
+    // box2.position = new BABYLON.Vector3(-350, -150, 20);
+    // scene.addMesh(box2);
+    // meshList.push(box2);
 
     //Pirate hideout
     // const box3 = BABYLON.MeshBuilder.CreateSphere("pirate_base", {diameter: 100}, scene);
@@ -721,13 +777,22 @@
 
 
       console.log("All models loaded");
-        let position = new BABYLON.Vector3(50, 50, 50); // Placeholder position
-         let position1 = new BABYLON.Vector3(100, 100, 100); // Placeholder position
-        let position2 = new BABYLON.Vector3(150, 150, 150); // Placeholder position
-         let position3 = new BABYLON.Vector3(200, 200, 200); // Placeholder position
-         let position4 = new BABYLON.Vector3(250, 250, 250); // Placeholder position
-            let position5 = new BABYLON.Vector3(300, 300, 300); // Placeholder position
-      let position6 = new BABYLON.Vector3(350, 350, 350); // Placeholder position
+        let position = new BABYLON.Vector3(30, -25, -500); // Placeholder position
+         let position1 = new BABYLON.Vector3(20, 10, 250); // Placeholder position
+        let position2 = new BABYLON.Vector3(-95, -30, 500); // Placeholder position
+         let position3 = new BABYLON.Vector3(180, 50, -360); // Placeholder position
+         let position4 = new BABYLON.Vector3(-165,25, -145); // Placeholder position
+            let position5 = new BABYLON.Vector3(10, -50, 300); // Placeholder position
+      let position6 = new BABYLON.Vector3(-175, 25, 175); // Placeholder position
+      let position7 = new BABYLON.Vector3(-175, 100, 10); // Placeholder position
+      let position8 = new BABYLON.Vector3(200, 25, -85); // Placeholder position
+      let position9 = new BABYLON.Vector3(20, 0, -350); // Placeholder position
+      let position10 = new BABYLON.Vector3(-175, -100, 10); // Placeholder position
+      let position11 = new BABYLON.Vector3(0, 125, 0); // Placeholder position
+        let position12 = new BABYLON.Vector3(-340, -25, 15); // Placeholder position
+        let position13 = new BABYLON.Vector3(80,0,-540);
+        let position14 = new BABYLON.Vector3(-345,-155,-40);
+        let position15 = new BABYLON.Vector3(-150,-60, -400);
 
       createInstanceFromModel("debris1", position);
       createInstanceFromModel("debris2", position1);
@@ -736,6 +801,16 @@
       createInstanceFromModel("debris1", position4);
       createInstanceFromModel("debris2", position5);
         createInstanceFromModel("debris1", position6);
+        createInstanceFromModel("debris2", position7);
+        createInstanceFromModel("debris1", position8);
+        createInstanceFromModel("debris2", position9);
+        createInstanceFromModel("debris1", position10);
+        createInstanceFromModel("debris2", position11);
+        createInstanceFromModel("debris1", position12);
+        createInstanceFromModel("debris2", position13);
+        createInstanceFromModel("debris1", position14);
+        createInstanceFromModel("debris2", position15);
+
 
    //     createInstanceFromModel("debris3", position2);
     //    createInstanceFromModel("debris4", position3);
@@ -754,8 +829,8 @@
     // scene.ambientColor = new BABYLON.Color3(0.3, 0.3, 0.3)
 
     // Enable depth rendering for depth of field effect
-    new BABYLON.AxesViewer(scene, 5);
-    const axes = new BABYLON.Debug.AxesViewer(scene, 5)
+    // new BABYLON.AxesViewer(scene, 5);
+    // const axes = new BABYLON.Debug.AxesViewer(scene, 5)
     // scene.debugLayer.show();
     //return scene and meshList
     return scene;
@@ -800,6 +875,7 @@
   // Setup the button to call the toggle function
   document.getElementById('visibilityToggle').addEventListener('click', () => toggleMeshVisibility(lines));
   document.getElementById('prologueButton').addEventListener('click', () => openIntro());
+  document.getElementById('crewButton').addEventListener('click', () => openPlayers());
 
 
   /*
@@ -1157,7 +1233,7 @@
             console.log(meshContent.hasOwnProperty(poi_name)); // false if not in our object
             console.log(poi_name);
             console.log("Mesh: " + pickResult.pickedMesh.name + "; ID: " + meshContent[poi_name]);
-            document.getElementById("modal-iframe").innerHTML = "<iframe src=\"http://localhost:49449/graveyard_of_ships/" +
+            document.getElementById("modal-iframe").innerHTML = "<iframe src=\"http://localhost:63342/graveyard_of_ships/" +
                     meshContent[poi_name] +
                     "\" title=\"Modal\"frameborder=\"0\" style=" +
                     "height:100%;width:100%;position:absolute;top:0px;left:0px;right:0px;bottom:0px\"></iframe>"
@@ -1171,11 +1247,22 @@
     console.log("Opening intro");
       setTimeout(function () {
             toggleModal();
-            document.getElementById("modal-iframe").innerHTML = "<iframe src=\"http://localhost:49449/graveyard_of_ships/" +
+            document.getElementById("modal-iframe").innerHTML = "<iframe src=\"http://localhost:63342/graveyard_of_ships/" +
                     "locations/intro.html" +
                     "\" title=\"Modal\"frameborder=\"0\" style=" +
                     "height:100%;width:100%;position:absolute;top:0px;left:0px;right:0px;bottom:0px\"></iframe>"
       }, 1000);
+  }
+
+  function openPlayers() {
+    console.log("Opening players");
+    setTimeout(function () {
+      toggleModal();
+      document.getElementById("modal-iframe").innerHTML = "<iframe src=\"http://localhost:63342/graveyard_of_ships/" +
+              "locations/players.html" +
+              "\" title=\"Modal\"frameborder=\"0\" style=" +
+              "height:100%;width:100%;position:absolute;top:0px;left:0px;right:0px;bottom:0px\"></iframe>"
+    }, 1000);
   }
 
 

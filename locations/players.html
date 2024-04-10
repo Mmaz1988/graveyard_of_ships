@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>The central station</title>
+
+  <link rel="stylesheet" type="text/css" href="pages.css">
+
+
+</head>
+
+<body>
+<div class = "modal-container">
+
+  <div class = "google-slides-container">
+<iframe id="slidesIframe" frameborder="0" allowfullscreen="true"></iframe>
+    </div>
+</div>
+</body>
+
+
+
+<script>
+  //Set these links for new elements
+  const slides = "https://docs.google.com/presentation/d/1WLNzd3HGYByVm_LRcVMBznYXrU1Z7TBfQ-cMwOwDGO8/embed?start=false&loop=false&delayms=3000"
+
+
+  document.addEventListener('DOMContentLoaded', (event) => {
+    document.getElementById('slidesIframe').src = slides;
+  });
+
+  // document.addEventListener('DOMContentLoaded', (event) => {
+  //   document.getElementById('image').src = map;
+  // });
+
+  /*
+  Logic for switching tabs including loading the map if the corresponding tab is loaded
+   */
+
+</script>
+</html>
