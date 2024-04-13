@@ -689,12 +689,23 @@
 
 
     const varutha_fog = {position: new BABYLON.Vector3(0, -20, 0), sphereEmitterRadius: 130}
+    const varutha2_fog = {position: new BABYLON.Vector3(0, -20, -200), sphereEmitterRadius: 80,particleNumber: 70}
+    const varutha3_fog = {position: new BABYLON.Vector3(0, -20, -300), sphereEmitterRadius: 60,particleNumber: 50}
+    const varutha4_fog = {position: new BABYLON.Vector3(-100, -20, -200), sphereEmitterRadius: 80,particleNumber: 70}
+    const varutha5_fog = {position: new BABYLON.Vector3(-150, -20, -250), sphereEmitterRadius: 60,particleNumber: 50}
+    const varutha6_fog = {position: new BABYLON.Vector3(-200, -20, -100), sphereEmitterRadius: 80,particleNumber: 70}
     const sleeping_beauty_fog = {sphereEmitterRadius: 80,
       particleColors: {color1: "#670f0f", color2: "#561313", colorDead: "#6c2424"},
       position: new BABYLON.Vector3(200, 100, 150)}
 
 
     var varutha_fog_system = createNewSphericalParticleSystem(scene, varutha_fog);
+    var varutha2_fog_system = createNewSphericalParticleSystem(scene, varutha2_fog);
+    var varutha3_fog_system = createNewSphericalParticleSystem(scene, varutha3_fog);
+    var varutha4_fog_system = createNewSphericalParticleSystem(scene, varutha4_fog);
+    var varutha5_fog_system = createNewSphericalParticleSystem(scene, varutha5_fog);
+    var varutha6_fog_system = createNewSphericalParticleSystem(scene, varutha6_fog);
+
 
 
     console.log("particleColors before", JSON.stringify(sleeping_beauty_fog.particleColors));
@@ -705,10 +716,26 @@
 
 
 
-    // Restart the first particle system every 3 minutes
     setInterval(() => {
-      varutha_fog_system = restartParticleSystem(varutha_fog_system,varutha_fog, scene);
+      const varutha_fog = {position: new BABYLON.Vector3(0, -20, 0), sphereEmitterRadius: 130};
+      varutha_fog_system = restartParticleSystem(varutha_fog_system, varutha_fog, scene);
+
+      const varutha2_fog = {position: new BABYLON.Vector3(0, -20, -200), sphereEmitterRadius: 80, particleNumber: 70};
+      varutha2_fog_system = restartParticleSystem(varutha2_fog_system, varutha2_fog, scene);
+
+      const varutha3_fog = {position: new BABYLON.Vector3(0, -20, -300), sphereEmitterRadius: 60, particleNumber: 50};
+      varutha3_fog_system = restartParticleSystem(varutha3_fog_system, varutha3_fog, scene);
+
+      const varutha4_fog = {position: new BABYLON.Vector3(-100, -20, -200), sphereEmitterRadius: 80, particleNumber: 70};
+      varutha4_fog_system = restartParticleSystem(varutha4_fog_system, varutha4_fog, scene);
+
+      const varutha5_fog = {position: new BABYLON.Vector3(-150, -20, -250), sphereEmitterRadius: 60, particleNumber: 50};
+      varutha5_fog_system = restartParticleSystem(varutha5_fog_system, varutha5_fog, scene);
+
+      const varutha6_fog = {position: new BABYLON.Vector3(-200, -20, -100), sphereEmitterRadius: 80, particleNumber: 70};
+      varutha6_fog_system = restartParticleSystem(varutha6_fog_system, varutha6_fog, scene);
     }, 180000);
+
 
 // Restart the second particle system every 3 minutes, on a different schedule if desired
     setInterval(() => {
