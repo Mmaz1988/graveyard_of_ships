@@ -73,7 +73,7 @@
     metal_crusher_nest: 'locations/metal_crusher_nest.html',
     Korpus: 'locations/pirate_outpost.html',
     sleeping_beauty: 'locations/sleeping_beauty.html',
-    bumblebee: 'locations/bumblebee.html',
+    body2: 'locations/bumblebee.html',
     damians_ship: 'locations/damians_ship.html'
   }
 
@@ -226,7 +226,12 @@
 
       console.log("Set position");
       bumblebee.freezeWorldMatrix();
+
     }
+
+    bumblebee_task.onError = function (task, message, exception) {
+      console.log(message, exception);
+    };
 
     const damian_task = assetsManager.addMeshTask("damian task", "", "http://localhost:8080/models/","damian_ship.glb");
 
@@ -777,7 +782,7 @@
 
 
       console.log("All models loaded");
-        let position = new BABYLON.Vector3(30, -25, -500); // Placeholder position
+      let position = new BABYLON.Vector3(30, -25, -500); // Placeholder position
          let position1 = new BABYLON.Vector3(20, 10, 250); // Placeholder position
         let position2 = new BABYLON.Vector3(-95, -30, 500); // Placeholder position
          let position3 = new BABYLON.Vector3(180, 50, -360); // Placeholder position
@@ -794,7 +799,7 @@
         let position14 = new BABYLON.Vector3(-345,-155,-40);
         let position15 = new BABYLON.Vector3(-150,-60, -400);
 
-      createInstanceFromModel("debris1", position);
+     createInstanceFromModel("debris1", position);
       createInstanceFromModel("debris2", position1);
       createInstanceFromModel("debris1", position2);
       createInstanceFromModel("debris2", position3);
@@ -1219,7 +1224,7 @@
       setTimeout(function () {
         if (pickResult.hit) {
           console.log("pickResult.hit: " + pickResult.pickedMesh.name);
-          const regex = /^(.*)(_primitive\d+)$/;
+          const regex = /^(.*)(_primitive\d+|\.\d+)$/;
           var match = pickResult.pickedMesh.name.match(regex);
           var poi_name = pickResult.pickedMesh.name;
           if (match){
