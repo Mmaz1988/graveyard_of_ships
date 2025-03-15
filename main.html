@@ -1245,6 +1245,8 @@
 
   //Open modal frame with location information
   // Checking onPointerDown event, see console
+  const BASE_URL = window.location.origin;
+
 
   function addInfoTolocations(scene) {
     scene.onPointerDown = function (evt, pickResult) {
@@ -1265,7 +1267,7 @@
             console.log(meshContent.hasOwnProperty(poi_name)); // false if not in our object
             console.log(poi_name);
             console.log("Mesh: " + pickResult.pickedMesh.name + "; ID: " + meshContent[poi_name]);
-            document.getElementById("modal-iframe").innerHTML = "<iframe src=\"http://localhost:63342/graveyard_of_ships/" +
+            document.getElementById("modal-iframe").innerHTML = "<iframe src=\"${BASE_URL}/graveyard_of_ships/" +
                     meshContent[poi_name] +
                     "\" title=\"Modal\"frameborder=\"0\" style=" +
                     "height:100%;width:100%;position:absolute;top:0px;left:0px;right:0px;bottom:0px\"></iframe>"
@@ -1279,7 +1281,7 @@
     console.log("Opening intro");
       setTimeout(function () {
             toggleModal();
-            document.getElementById("modal-iframe").innerHTML = "<iframe src=\"http://localhost:63342/graveyard_of_ships/" +
+            document.getElementById("modal-iframe").innerHTML = "<iframe src=\"${BASE_URL}/graveyard_of_ships/" +
                     "locations/intro.html" +
                     "\" title=\"Modal\"frameborder=\"0\" style=" +
                     "height:100%;width:100%;position:absolute;top:0px;left:0px;right:0px;bottom:0px\"></iframe>"
@@ -1290,7 +1292,7 @@
     console.log("Opening players");
     setTimeout(function () {
       toggleModal();
-      document.getElementById("modal-iframe").innerHTML = "<iframe src=\"http://localhost:63342/graveyard_of_ships/" +
+      document.getElementById("modal-iframe").innerHTML = "<iframe src=\"${BASE_URL}/graveyard_of_ships/" +
               "locations/players.html" +
               "\" title=\"Modal\"frameborder=\"0\" style=" +
               "height:100%;width:100%;position:absolute;top:0px;left:0px;right:0px;bottom:0px\"></iframe>"
