@@ -884,6 +884,7 @@
 
   engine.runRenderLoop(function () {
     // console.log(performance.memory.usedJSHeapSize);
+
     scene.render();
   });
 
@@ -972,11 +973,13 @@
       scene.activeCamera = arcRotateCamera;
       arcRotateCamera.position = universalCamera.position;
       arcRotateCamera.attachControl(scene.getEngine().getRenderingCanvas(), true);
+      console.log("Switched to ArcRotateCamera")
     } else {
       scene.activeCamera = universalCamera;
       universalCamera.position = arcRotateCamera.position;
       universalCamera.setTarget(lastSelectedMesh.position)
       universalCamera.attachControl(scene.getEngine().getRenderingCanvas(), true);
+        console.log("Switched to UniversalCamera")
     }
   }
 
@@ -1104,6 +1107,36 @@
     }
   }
 
+  // Function to animate a property with callback
+  function animateProperty(target, property, startValue, endValue, speed, easing, onAnimationEnd) {
+    let scene = target.getScene();
+    let animation = new BABYLON.Animation(
+            `${property}_animation`,
+            property,
+            speed, // Speed in FPS
+            BABYLON.Animation.ANIMATIONTYPE_VECTOR3,
+            BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT
+    );
+
+    let keys = [];
+    keys.push({ frame: 0, value: startValue });
+    keys.push({ frame: 120, value: endValue }); // 120 frames at given FPS
+
+    animation.setKeys(keys);
+    animation.setEasingFunction(easing);
+
+    target.animations.push(animation);
+
+    let animatable = scene.beginAnimation(target, 0, 120, false, 1, () => {
+      console.log(`✅ Animation finished for ${property}`);
+      if (onAnimationEnd) {
+        onAnimationEnd();
+      }
+    });
+
+    return animatable; // Allows further tracking if needed
+  }
+
   //Zoom in on mesh upon click
   function applyZoom(mesh,camera,target) {
     if (!mesh.actionManager) {
@@ -1120,16 +1153,14 @@
             new BABYLON.ExecuteCodeAction(
                     BABYLON.ActionManager.OnPickTrigger,
                     function (event) {
-
                       if (scene.activeCamera === universalCamera) {
                         switchCamera(scene);
                       }
 
-
                       var pickedMesh = event.meshUnderPointer;
                       if (pickedMesh === mesh) {
                         lastSelectedMesh = mesh;
-                        var angle =  Math.PI / 4; // 225 degrees
+                        var angle = Math.PI / 4; // 225 degrees
                         console.log("zoom_mesh_name", mesh.name);
                         var distance = getLongestSideOfMesh(target).length * 3; // distance from the mesh
 
@@ -1139,81 +1170,35 @@
                         var camZ = target.getAbsolutePosition().z - distance * Math.sin(angle);
 
                         var camEndPos = new BABYLON.Vector3(camX, camY, camZ);
-
-                        // Calculate the new target position
-                        /*
-                        var targetX = mesh.getAbsolutePosition().x;
-                        var targetY = mesh.getAbsolutePosition().y;
-                        var targetZ = mesh.getAbsolutePosition().z;
-
-                        var targetEndPos = new BABYLON.Vector3(targetX, targetY, targetZ);
-                         */
-
                         var targetEndPos = target.getAbsolutePosition();
-
 
                         var speed = 45;
                         var ease = new BABYLON.CubicEase();
-
                         ease.setEasingMode(BABYLON.EasingFunction.EASINGMODE_EASEINOUT);
 
+                        console.log("🎯 Animating Camera Position & Target...");
 
-                        // var animationsCompleted = 0; // Counter to track completed animations
-                        //
-                        // // Function to increment counter and check if both animations are complete
-                        // var onAnimationEnd = function () {
-                        //   animationsCompleted += 1;
-                        //   if (animationsCompleted === 2) { // Ensure both animations have completed
-                        //     fogify(scene, 0.30, 50.0, 25); // Adjust the rate as needed
-                        //   }
-                        // };
+                        // Stop any existing animations
+                        scene.stopAnimation(scene.activeCamera);
 
-                       //  firstAnimationDone = false;
-                       //  secondAnimationDone = false;
-                       //
-                       //  var onAnimationEnd1 = function () {
-                       //    console.log("First animation done");
-                       //    firstAnimationDone = true;
-                       //      if (firstAnimationDone && secondAnimationDone) {
-                       //       switchCamera(scene);
-                       //      }
-                       // };
-                       //
-                       //  var onAnimationEnd2 = function () {
-                       //    console.log("Second animation done")
-                       //    secondAnimationDone = true;
-                       //    if (firstAnimationDone && secondAnimationDone) {
-                       //      switchCamera(scene);
-                       //    }
-                       //  };
-
-
-                        BABYLON.Animation.CreateAndStartAnimation(
-                                'at4',
+                        let positionAnim = animateProperty(
                                 scene.activeCamera,
                                 'position',
-                                speed,
-                                120,
                                 scene.activeCamera.position,
                                 camEndPos,
-                                0,
-                                ease
-                                // ,
-                                // onAnimationEnd1
+                                speed,
+                                ease,
+                                () => console.log("✅ Camera position animation finished.")
                         );
 
-                        BABYLON.Animation.CreateAndStartAnimation(
-                                'at5',
+                        let targetAnim = animateProperty(
                                 scene.activeCamera,
                                 'target',
-                                speed,
-                                120,
                                 scene.activeCamera.target,
                                 targetEndPos,
-                                0,
-                                ease
-                                // ,
-                                // onAnimationEnd2
+                                speed,
+                                ease,
+                                () => console.log("✅ Camera target animation finished.")
                         );
                       }
                     }
@@ -1245,57 +1230,65 @@
 
   //Open modal frame with location information
   // Checking onPointerDown event, see console
-  const BASE_URL = window.location.origin;
 
+  // Open modal frame with location information
+  // Checking onPointerDown event, see console
+  const BASE_URL = window.location.origin;
 
   function addInfoTolocations(scene) {
     scene.onPointerDown = function (evt, pickResult) {
       setTimeout(function () {
         if (pickResult.hit) {
           console.log("pickResult.hit: " + pickResult.pickedMesh.name);
+
           const regex = /^(.*)(_primitive\d+|\.\d+)$/;
           var match = pickResult.pickedMesh.name.match(regex);
-          var poi_name = pickResult.pickedMesh.name;
-          if (match){
-            poi_name = match[1];
-          }
+          var poi_name = match ? match[1] : pickResult.pickedMesh.name;
 
-
-            if (meshContent[poi_name]) {
+          if (meshContent[poi_name]) {
             console.log("In the list");
             toggleModal();
             console.log(meshContent.hasOwnProperty(poi_name)); // false if not in our object
             console.log(poi_name);
             console.log("Mesh: " + pickResult.pickedMesh.name + "; ID: " + meshContent[poi_name]);
-            document.getElementById("modal-iframe").innerHTML = "<iframe src=\"${BASE_URL}/graveyard_of_ships/" +
-                    meshContent[poi_name] +
-                    "\" title=\"Modal\"frameborder=\"0\" style=" +
-                    "height:100%;width:100%;position:absolute;top:0px;left:0px;right:0px;bottom:0px\"></iframe>"
+
+            // Corrected template string usage
+            document.getElementById("modal-iframe").innerHTML = `
+                        <iframe src="${BASE_URL}/graveyard_of_ships/${meshContent[poi_name]}"
+                            title="Modal" frameborder="0"
+                            style="height:100%; width:100%; position:absolute; top:0px; left:0px; right:0px; bottom:0px;">
+                        </iframe>
+                    `;
           }
         }
       }, 1000);
-    }
+    };
   }
+
 
   function openIntro() {
     console.log("Opening intro");
-      setTimeout(function () {
-            toggleModal();
-            document.getElementById("modal-iframe").innerHTML = "<iframe src=\"${BASE_URL}/graveyard_of_ships/" +
-                    "locations/intro.html" +
-                    "\" title=\"Modal\"frameborder=\"0\" style=" +
-                    "height:100%;width:100%;position:absolute;top:0px;left:0px;right:0px;bottom:0px\"></iframe>"
-      }, 1000);
+    setTimeout(function () {
+      toggleModal();
+      document.getElementById("modal-iframe").innerHTML = `
+            <iframe src="${BASE_URL}/graveyard_of_ships/locations/intro.html"
+                title="Modal" frameborder="0"
+                style="height:100%; width:100%; position:absolute; top:0px; left:0px; right:0px; bottom:0px;">
+            </iframe>
+        `;
+    }, 1000);
   }
 
   function openPlayers() {
     console.log("Opening players");
     setTimeout(function () {
       toggleModal();
-      document.getElementById("modal-iframe").innerHTML = "<iframe src=\"${BASE_URL}/graveyard_of_ships/" +
-              "locations/players.html" +
-              "\" title=\"Modal\"frameborder=\"0\" style=" +
-              "height:100%;width:100%;position:absolute;top:0px;left:0px;right:0px;bottom:0px\"></iframe>"
+      document.getElementById("modal-iframe").innerHTML = `
+            <iframe src="${BASE_URL}/graveyard_of_ships/locations/players.html"
+                title="Modal" frameborder="0"
+                style="height:100%; width:100%; position:absolute; top:0px; left:0px; right:0px; bottom:0px;">
+            </iframe>
+        `;
     }, 1000);
   }
 
